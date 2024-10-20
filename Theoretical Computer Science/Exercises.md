@@ -310,3 +310,129 @@ stateDiagram
 	q5 --> [*]
 ```
 
+
+
+# Ex 4
+
+## Design a k-tapes TM transducer (input/output)
+
+given $w = \{a^{n}b^{m} \space | \space n,m \in \mathbb{N}\}$, output a string u with respect to
+
+* it has the same number of `a` and of `b` as w
+* the `a` and `b` appear alternately (until is possible)
+	* Input: `aaabbb` --> Output: `ababab`
+	* Input: `aaab` --> Output: `abaa`
+	* Input: `abbb` --> Output: `abbb`
+	* If $w \notin \{a^{n}b^{m} \space | \space n, m \in \mathbb{N}\}$, then the machine does not produce an output
+
+### k = 2
+
+One tape to count in unary the number of `a` , one for the `b`
+
+* Input tape: `aaab`
+* Memory tape 1: `aaa`
+* Memory tape 2: `b`
+* Output tape: `abaa`
+
+### k = 1
+
+* Input tape: `aaaaabbbbbbbb`
+* Memory tape: `aaaaabbbbbbbb`  --modify the second a to c and reach the first b modify it to a--> `acaaaabbbbbbb` --modify c to b and next second a to c then reach the first b modify it to a--> `abacaaabbbbbb`  ----> `ababacaabbbbb` ----> `ababababacabbbb` ----> `ababababababbbb`
+* Output tape: `ababababababbbb`
+
+
+
+## Design a k-tapes TM transducer that outputs (in unary) the product of two naturals numbers (in unary)
+
+* Input tape: `1 1 1 $ 1 1` (`$` is a separator)
+* Output tape: `1 1 1 1 1 1` ($3 \times 2 = 6$)
+
+### k = 1
+
+* $q_0$ to copy in memory the first sequence of `1` 
+* $q_1$ to read the input after `$`, 
+* $q_w$ to write the memory to the output
+* $q_r$ to rewind the memory tape
+* $q_f$ final
+
+```mermaid
+stateDiagram
+	direction LR
+	[*] --> q0
+	q0 --> q0 : 1, Z0 | Z0, (S, R) | \n 1, _ | 1 (R, R) |
+	q0 --> q1 : $, _ | _, (R, S) |
+	q0 --> qf : _, Z0 | Z0, (S, S) |
+	q1 --> qf : _, _ | _, (S, S) |
+	q1 --> qw : 1, _ | _, (S, L) |
+	qw --> qw : 1, 1 | 1, (S, L) | 1 (output)
+	qw --> qr : 1, Z0 | Z0, (S, R) |
+  qr --> qr : 1, 1 | 1, (S, R) |
+	qr --> q1 : 1, _ | _, (R, S) | 
+	qf --> [*]
+```
+
+
+
+## Consider $L = \{uww^{R}v \space | \space u, v, w \in \{a, b\}^{+}\}$ (R is the reverse (as mirror) of $w$, if $w=abb$, then $w^{R}=bba$), find a minimal power machine t hat recgonizes $L$
+
+Consider $|w| \geq 2$, $w = w' \cdot c$, $c \in \{a,b\}$
+
+* $uww^{R}v = \underbrace{u \cdot w'}_{u' \in \{a,b\}^{+}} \cdot c \cdot c \cdot \underbrace{(w')^{R} \cdot v}_{v' \in \{a,b\}^{+}} = u' \cdot c \cdot c \cdot v'$
+* we can rewrite $L=(a\overset{\downarrow OR}{+}b)^{+} \cdot (aa+bb) \cdot (a+b)^{+}$
+* $L$ is  regular, we can recognize it with **FSA**
+* $aa \notin L$, $aabab \notin L$, $aaab \in L$
+
+```mermaid
+stateDiagram
+	direction LR
+	[*] --> q0
+	q0 --> q1 : a, b
+	q1 --> q1 : a, b
+	q1 --> q2 : a
+	q2 --> q3 : a
+	q1 --> q4 : b
+	q4 --> q3 : b
+	q3 --> q5 : a, b
+	q5 --> q5 : a, b
+	q5 --> [*]
+```
+
+This is a **NON DETERMINISTIC** automaton (exist at least one state has multiple path with same label, e.g., q1), we can translate it to **DETERMINISTIC**:
+
+```mermaid
+stateDiagram
+	direction LR
+	[*] --> q0
+	q0 --> q1 : a, b
+	q1 --> q1,q2 : a
+	q1,q2 --> q1 : b
+	q1 --> q1,q4 : b
+	q1,q4 --> q1 : a
+	q1,q2 --> q1,q2,q3 : a
+	q1,q4 --> q1,q3,q4 : b
+	q1,q2,q3 --> q1,q2,q3,q5 : a
+	q1,q2,q3 --> q1,q4,q5 : b
+	q1,q3,q4 --> q1,q2,q5 : a
+	q1,q3,q4 --> q1,q3,q4,q5 : b
+	q1,q2,q3,q5 --> q1,q2,q3,q5 : a
+	q1,q2,q3,q5 --> q1,q4,q5 : b
+	q1,q4,q5 --> q1,q2,q3,q5 : a
+	q1,q4,q5 --> q1,q2,q5 : b
+	q1,q2,q5 --> q1,q4,q5 : a
+	q1,q2,q5 --> q1,q3,q4,q5 : b
+	q1,q3,q4,q5 --> q1,q2,q5 : a
+	q1,q3,q4,q5 --> q1,q3,q4,q5 : b
+	q1,q2,q3,q5 --> [*]
+	q1,q4,q5 --> [*]
+	q1,q2,q5 --> [*]
+	q1,q3,q4,q5 --> [*]
+```
+
+
+
+## Prove that $L=\{w \in \{a,b\}^{*}$ | for all substring $u$ of $w$, we have $-5 \leq \#_{a}(u)-\#_{b}(u) \leq 5 \}$ is regular
+
+We can construct FSA for it:
+
+![image-20241020144620457](assets/image-20241020144620457.png)
+
