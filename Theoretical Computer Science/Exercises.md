@@ -436,3 +436,283 @@ We can construct FSA for it:
 
 ![image-20241020144620457](assets/image-20241020144620457.png)
 
+
+
+# Ex 5: Non-deterministic Pushdown automata & Grammar
+
+Alphabet $\Sigma=\{a, b, \$, *\}$
+
+
+
+## $L_1 = \{a^n b^n \space | \space n \geq 1\} \cup \{a^n b^{2n} \space | \space n \geq 1\}$
+
+```mermaid
+stateDiagram
+	direction LR
+	[*] --> q0
+	q0 --> DPA(a^n*b^n) : ε, Z0 | Z0
+	q0 --> DPA(a^n*b^2n) : ε, Z0 | Z0
+```
+
+
+
+## $L_2 = \{*a^n b^n \space | \space n \geq 1\} \cup \{\$a^n b^{2n} \space | \space n \geq 1\}$
+
+This is a **deterministic** pushdown automata: 
+
+```mermaid
+stateDiagram
+	direction LR
+	[*] --> q0
+	q0 --> q1 : *, Z0 | Z0
+	q1 --> q2 : a, Z0 | Z0 A
+	q2 --> q2 : a, A | A A
+	q2 --> q3 : b, A | ε
+	q3 --> q3 : b, A | ε
+	q3 --> q4 : ε, Z0 | ε
+	q0 --> q5 : $, Z0 | Z0
+	q5 --> q6 : a, Z0 | Z0 A A
+	q6 --> q6 : a, A | A A A
+	q6 --> q7 : b, A | ε
+	q7 --> q7 : b, A | ε
+	q7 --> q4 : ε, Z0 | ε
+	q4 --> [*]
+	
+```
+
+
+
+## $L_3 = \{a^n * b^n \space | \space n \geq 1\} \cup \{a^n \$ b^{2n} \space | \space n \geq 1\}$
+
+This is a **deterministic** pushdown automata: 
+
+```mermaid
+stateDiagram
+	direction LR
+	[*] --> q0
+	q0 --> q1 : a, Z0 | Z0 A
+	q1 --> q1 : a, A | A A
+	q1 --> q2 : *, A | A
+	q2 --> q3 : b, A | ε
+	q3 --> q3 : b, A | ε
+	q3 --> q4 : ε, Z0 | Z0
+	q1 --> q5 : $, A | A
+	q5 --> q6 : b, A | A
+	q6 --> q5 : b, A | ε
+	q5 --> q4 : ε, Z0 | Z0
+	q4 --> [*]
+```
+
+
+
+## $L_4 = \{a^n b^n * \space | \space n \geq 1\} \cup \{a^n b^{2n} \$ \space | \space n \geq 1\}$
+
+```mermaid
+stateDiagram
+	direction LR
+	[*] --> q0
+	q0 --> DPA(a^n*b^n(*)) : ε, Z0 | Z0
+	q0 --> DPA(a^n*b^2n($)) : ε, Z0 | Z0
+```
+
+
+
+## $L = \{ww \space | \space w \in \{a,b\}^*\}$
+
+It's complementary is $L'=\overline{\{ww \space | \space w \in \{a,b\}^*\}} = \{u \in \{a,b\}^* \space | \space \forall w \in \{a,b\}^* : ww \neq u\}$ which is recognized by a **NDPA**
+
+$L' = \{w \in \{a,b\}^* \space | \space |w| \space \text{is odd}\} \\ \cup \{w = \alpha a \beta b \gamma \space | \space \alpha, \beta, \gamma \in \{a,b\}^* \space \text{and} \space |\beta| = |\alpha \gamma| \} \\ \cup \{w = \alpha b \beta a \gamma \space | \space \alpha, \beta, \gamma \in \{a,b\}^* \space \text{and} \space |\beta| = |\alpha \gamma| \}$
+
+e.g. $aabbabaaabbb \in L'$
+
+* we can select first two $a$ as $\alpha$
+* last three $b$ as $\gamma$
+* the middle $babaa$ as $\beta$
+
+```mermaid
+stateDiagram
+	direction LR
+	[*] --> q0
+	q0 --> q1 : ε, Z0 | Z0
+	q1 --> q2 : a, Z0 | Z0 \n b, Z0 | Z0
+	q2 --> q1 : a, Z0 | Z0 \n b, Z0 | Z0
+	q2 --> [*]
+	q0 --> q3 : ε, Z0 | Z0
+	q3 --> q3 : a, Z0 | Z0 X \n b, Z0 | Z0 X \n a, X | X X \n b, X | X X
+	q3 --> q4 : a, Z0 | Z0 \n a, X | X
+	q4 --> q4 : a, X | ε \n b, X | ε
+	q4 --> q5 : ε, Z0 | Z0
+	q5 --> q5 : a, Z0 | Z0 X \n b, Z0 | Z0 X \n a, X | X X \n b, X | X X
+	q5 --> q6 : b, Z0 | Z0 \n b, X | X
+	q6 --> q6 : a, X | ε \n b, X | ε
+	q6 --> q7 : ε, Z0 | Z0
+	q7 --> [*]
+	q3 --> q8 : b, Z0 | Z0 \n b, X | X
+	q8 --> q8 : a, X | ε \n b, X | ε
+	q8 --> q9 : ε, Z0 | Z0
+	q9 --> q9 : a, Z0 | Z0 X \n b, Z0 | Z0 X \n a, X | X X \n b, X | X X
+	q9 --> q6 : a, Z0 | Z0 \n a, X | X
+```
+
+* `q0 --> q1 --> q2 --> [*]`  accepts $\{w \in \{a,b\}^* \space | \space |w| \space \text{is odd}\}$
+* `q0 --> q3 --> q4 --> q5 --> q6 --> q7 --> [*]` accepts $\{w = \alpha a \beta b \gamma \space | \space \alpha, \beta, \gamma \in \{a,b\}^* \space \text{and} \space |\beta| = |\alpha \gamma| \}$
+* `q0 --> q3 --> q8 --> q9 --> q6 --> q7 --> [*]` accepts $\{w = \alpha b \beta a \gamma \space | \space \alpha, \beta, \gamma \in \{a,b\}^* \space \text{and} \space |\beta| = |\alpha \gamma| \}$
+
+ 
+
+## Formal grammars
+
+* Start from a symbol
+* Repeatly apply some "rewriting-rules"
+* Generate a word of **terminal symbols**
+
+
+
+$G = \langle V_N, V_T, P, S \rangle$
+
+* $V_N$ : Represents the set of **nonterminal symbols**. These symbols are placeholders that can be replaced by other symbols (both terminal and nonterminal) according to the grammar rules
+	* $V_N = \{S, A, B, C, D\}$
+* $V_T$ : Represents the set of **terminal symbols**. These symbols are the actual characters or tokens that appear in the strings of the language being generated. Terminals cannot be replaced further
+	* $V_T = \{a, b, c\}$
+* $V = V_N \cup V_T$ : This is the complete set of symbols, which includes both the terminal and nonterminal symbols ($V_N$ and $V_T$)
+* $S \in V_N$ : Represents a specific nonterminal symbol called the **start symbol** or **axiom**. This is the initial symbol from which the generation or derivation of strings begins
+* $P \subseteq V_N^+ \times V^*$ : Represents the set of **rewriting rules** or **productions**. Each rule specifies how a nonterminal (from $V_N$) can be replaced by a sequence of symbols (which could be terminals or nonterminals from $V$)
+	* $P = \{ \langle \alpha, \beta \rangle \ |\ \alpha \in V_N^+ \ \text{and} \ \beta \in V^* \}$
+		* $\alpha$ : a sequence of one or more nonterminal symbols ($\alpha \in V_N^+$).
+		* $\beta$ : a sequence of symbols (either terminals, nonterminals, or both, denoted as $\beta \in V^*$)
+		* The production rule $\langle \alpha, \beta \rangle$ can be written as $\alpha \rightarrow \beta$ , where $\alpha$ is rewritten as $\beta$ . This emphasizes the idea of **rewriting** in the grammar
+		* $P = \{S \rightarrow AB, BA \rightarrow cCD, CBS \rightarrow ab, A \rightarrow \varepsilon\}$
+			* $S \rightarrow AB$ : This rule means that the nonterminal $S$ can be replaced with the nonterminal sequence $AB$
+			* $BA \rightarrow cCD$ : This rule states that the nonterminal sequence $BA$ can be replaced by the sequence $cCD$. This involves both terminal ($c$) and nonterminal symbols ($C$ and $D$)
+			* $CBS \rightarrow ab$ : This rule states that the nonterminal sequence $CBS$ can be replaced with the terminal string $ab$
+			* $A \rightarrow \varepsilon$ : This rule specifies that the nonterminal $A$ can be replaced by the empty string (denoted by $\varepsilon$). This is known as an **epsilon production** and means that $A$ can “disappear” during the rewriting process
+
+
+
+| type | name                           | production                                                   | machine         |
+| ---- | ------------------------------ | ------------------------------------------------------------ | --------------- |
+| 0    | Unrestricted (general) grammar | $-$                                                          | TM              |
+| 1    | Monotone (context-sensitive)   | $|\alpha| \leq |\beta|$                                      | Linear automata |
+| 2    | Context-free                   | $|\alpha| = 1$                                               | NDPA            |
+| 3    | Regular                        | $A \rightarrow aB \\ A \rightarrow a \\ S \rightarrow \varepsilon$ | (D/ND) FA       |
+
+
+
+ ## Define a (regular) grammar such that $L(G) = L(A)$
+
+### EX 1: From FA to Grammar
+
+```mermaid
+stateDiagram
+	direction LR
+  [*] --> S
+  S --> S : a
+  S --> Q2 : b 
+  S --> Q3 : a
+  Q3 --> Q3 : b
+  Q3 --> Q4 : a
+  Q4 --> Q2 : a
+  Q2 --> [*]
+```
+
+From the diagram we can know $L(A) = a^*b + a^+b^*aa$
+
+Idea: 
+
+* states are non-terminal
+
+* Terminal: $a$ , $b$
+* Transitions are simulated by productions
+
+$G = \langle V_T = \{a, b\}, \space V_N=\{S, Q_2, Q_3, Q_4\}, \space S, \space P \rangle$
+
+* $P = \{S \rightarrow aS |aQ_3|bQ_2|b, \space Q_3 \rightarrow aQ_4|bQ_3, \space Q_4 \rightarrow aQ_2|a\}$
+* e.g., $S \overset{s \rightarrow aS}{\Rightarrow}aS \overset{S \rightarrow aQ_3}{\Rightarrow} aaQ_3 \overset{Q_3 \rightarrow bQ_3}{\Rightarrow} aabQ_3 \overset{Q_3 \rightarrow aQ_4}{\Rightarrow} aabaQ_4 \overset{Q_4 \rightarrow a}{\Rightarrow} aabaa \in L(A)$
+
+
+
+### EX 2: From FA to Grammer
+
+```mermaid
+stateDiagram
+	direction LR
+	[*] --> q0
+	q0 --> q0 : a
+	q0 --> q1 : a
+	q1 --> q2 : b
+	q2 --> q3 : b
+	q3 --> q2 : b  
+	q3 --> [*]
+```
+
+From the diagram we can know $L(A) = a^+(bb)^+$
+
+$G = \langle V_T = \{a, b\}, \space V_N=\{S, Q_2, Q_3, Q_4\}, \space S, \space P \rangle$
+
+* $P = \{S \rightarrow aS|aQ_1, \space Q_1 \rightarrow bQ_2, \space Q_2 \rightarrow bQ|b, \space Q_3 \rightarrow bQ_2\}$
+
+
+
+### EX 3: From Grammar to FA
+
+$G = \langle V_T = \{a, b\}, \space V_N=\{S, A, B, C\}, \space S, \space P \rangle$
+
+* $P = \{S \rightarrow a|aS|aC, \space A \rightarrow bC, \space B \rightarrow aC|aB|bS|bA, \space C \rightarrow a|bB\}$
+
+```mermaid
+stateDiagram
+	direction LR
+	[*] --> S
+	S --> F : a
+	F --> [*]
+	S --> S : a
+	S --> C : a
+	
+	A --> C : b
+	
+	B --> C : a
+	B --> B : a
+	B --> S : b
+	B --> A : b
+	
+	C --> F : a
+	C --> B : b
+```
+
+
+
+### EX 4: $L_1 = \{a^nb^{2m} \space | \space n,m \geq 1\}$
+
+```mermaid
+stateDiagram
+	direction LR
+	[*] --> S
+	S --> Q2 : a
+	Q2 --> Q2 : a
+	Q2 --> Q3 : b
+	Q3 --> Q4 : b
+	Q4 --> Q3 : b
+	Q4 --> [*]
+```
+
+$G = \langle V_T = \{a, b\}, \space V_N=\{S, Q_2, Q_3, Q_4\}, \space S, \space P \rangle$
+
+* From the FA we can see $P = \{S \rightarrow aQ_2, \space Q_2 \rightarrow aQ_2|bQ_3, \space Q_3 \rightarrow bQ_4|b, \space Q_4 \rightarrow bQ_3\}$
+
+* Or we can simply see the expression of $L_1$ then deduce $P = \{S \rightarrow aQbb|abb, \space Q \rightarrow a|aQ|bb|Qbb\}$, but this is **not** regular
+
+
+
+### EX 5: $L_2 = \{a^nb^{3n} \space | \space n \geq 0\}$
+
+$P = \{S \rightarrow aSbbb|\varepsilon\}$
+
+
+
+### EX 6: $L_3 = L_1 \cap L_2$
+
+We can find the expression of $L3 = \{a^{2n}b^{6n} \space | \space n \geq 1\}$
+
+$P = \{S \rightarrow aaSbbbbbb|aabbbbbb\}$
+
+ 
