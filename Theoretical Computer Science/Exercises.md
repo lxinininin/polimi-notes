@@ -600,7 +600,7 @@ $G = \langle V_N, V_T, P, S \rangle$
 
  ## Define a (regular) grammar such that $L(G) = L(A)$
 
-### EX 1: From FA to Grammar
+### Ex 1: From FA to Grammar
 
 ```mermaid
 stateDiagram
@@ -631,7 +631,7 @@ $G = \langle V_T = \{a, b\}, \space V_N=\{S, Q_2, Q_3, Q_4\}, \space S, \space P
 
 
 
-### EX 2: From FA to Grammer
+### Ex 2: From FA to Grammer
 
 ```mermaid
 stateDiagram
@@ -653,7 +653,7 @@ $G = \langle V_T = \{a, b\}, \space V_N=\{S, Q_2, Q_3, Q_4\}, \space S, \space P
 
 
 
-### EX 3: From Grammar to FA
+### Ex 3: From Grammar to FA
 
 $G = \langle V_T = \{a, b\}, \space V_N=\{S, A, B, C\}, \space S, \space P \rangle$
 
@@ -681,7 +681,7 @@ stateDiagram
 
 
 
-### EX 4: $L_1 = \{a^nb^{2m} \space | \space n,m \geq 1\}$
+### Ex 4: $L_1 = \{a^nb^{2m} \space | \space n,m \geq 1\}$
 
 ```mermaid
 stateDiagram
@@ -703,16 +703,130 @@ $G = \langle V_T = \{a, b\}, \space V_N=\{S, Q_2, Q_3, Q_4\}, \space S, \space P
 
 
 
-### EX 5: $L_2 = \{a^nb^{3n} \space | \space n \geq 0\}$
+### Ex 5: $L_2 = \{a^nb^{3n} \space | \space n \geq 0\}$
 
 $P = \{S \rightarrow aSbbb|\varepsilon\}$
 
 
 
-### EX 6: $L_3 = L_1 \cap L_2$
+### Ex 6: $L_3 = L_1 \cap L_2$
 
 We can find the expression of $L3 = \{a^{2n}b^{6n} \space | \space n \geq 1\}$
 
 $P = \{S \rightarrow aaSbbbbbb|aabbbbbb\}$
 
- 
+
+
+# Ex 6: Grammar & Logic
+
+## $L = \{a^n (bc)^m \ | \ n,m \geq 1, m \lt \frac{n}{2}\}$, find a grammar for $L$ of "minimal power"
+
+* $n = 1$ implies $1 \leq m \lt \frac{1}{2}$ , which is impossible
+* $n = 2$ implies $1 \leq m \lt \frac{2}{2} = 1$, which is impossible
+* $n = 3$ implies $1 \leq m \lt \frac{3}{2}$, where $m$ can be $1$, the shortest string $aaabc \in L$
+* $n = 4$ implies $1 \leq m \lt 2$, where $m$ can be $1$, the string can be $aaaabc \in L$
+* $n = 5$ implies $1 \leq m \lt \frac{5}{2}$, where $m$ can be $1$ or $2$, the string can be $aaaaabc \in L$, $aaaaabcbc \in L$
+
+Follow this rule, we can deduce $P = \{S \rightarrow ASB|aaabc|aaaabc, \ A \rightarrow aa, \ B \rightarrow bc|\varepsilon\}$
+
+* e.g., $S \overset{S \rightarrow ASB}{\Rightarrow} ASB \overset{S \rightarrow aaabc}{\Rightarrow} AaaabcB \overset{A \rightarrow aa}{\Rightarrow} aaaaabcB \overset{B \rightarrow \varepsilon}{\Rightarrow} aaaaabc$
+
+Another possible solution can be $P = \{S \rightarrow aaaXbc, \ X \rightarrow aaXbc|aX|\varepsilon\}$
+
+
+
+## $L = \{a^n b^{3n} \ | \ n \geq 0\} \cup \{a^n (bbbc)^n \ | \ n \geq 0\}$, find a grammar for $L$ of "minimal power"
+
+We can use a simple NDPA consists of DPA to recognize this language:
+
+```mermaid
+stateDiagram
+	direction LR
+	[*] --> q0
+	q0 --> DPA(a^n*b^3n)
+	q0 --> DPA(a^n*(bbbc)^n)
+```
+
+So we can easily find $P = \{S \rightarrow S_1|S_2, \ S_1 \rightarrow aS_1bbb|\varepsilon, \ S_2 \rightarrow aS_2bbbc|\varepsilon\}$
+
+* $S_1$ recognise $a^nb^{3n}$
+* $S_2$ recognise $a^n(bbbc)^n$
+
+
+
+## $L_1 = \{a^nw\ | \ w \in \{b,c\}^*, \ \#_b(w) = \#_c(w) = n, \ n \geq 1\}$
+
+If $L_1$ is CF, consider $R = a^*b^*c^*$ (regular) , then $L_1 \cap R = \{a^nb^nc^n \ | \ n \geq 1\}$ which is not CF (can not be recognised by NDPA) , thus is not CF **(Intersection between CF and REG is CF)**
+
+We can expressed it as **Monotone** grammar: $P = \{S \rightarrow aSBC|aBC, \ BC \rightarrow CB, \ CB \rightarrow BC, \ B \rightarrow b, \ C \rightarrow c \}$
+
+* e.g., for string `aaabbbccc` : $S \overset{S \rightarrow aSBC}{\Rightarrow} aSBC \overset{S \rightarrow aSBC}{\Rightarrow} aaSBCBC \overset{S \rightarrow aBC}{\Rightarrow} aaaBCBCBC \overset{CB \rightarrow BC}{\Rightarrow} aaaBBCCBC \overset{CB \rightarrow BC}{\Rightarrow} aaaBBCBCC \overset{CB \rightarrow BC}{\Rightarrow} aaaBBBCCC$
+
+
+
+## $L_2 = \{a^nw\ | \ w \in \{b,c\}^*, \ \#_b(w) + \#_c(w) = n, \ n \geq 1\}$
+
+We can recognise the language as **NDPA**, so it can be expressed as **CF** grammar
+
+* One solution can be $P = \{S \rightarrow aSX|ab|ac, \ X \rightarrow b|c\}$
+* We can also rewrite the solution as $P = \{S \rightarrow aSX|aX, \ X \rightarrow b|c\}$
+
+
+
+## $L_3 = \{a^nw\ | \ w \in \{b,c\}^*, \ \#_b(w) + \#_c(w) = 2n, \ n \geq 1\}$
+
+We can recognise the language as **NDPA**, so it can be expressed as **CF** grammar
+
+* One solution can be $P = \{S \rightarrow aSXX|abb|abc|acb|acc, \ X \rightarrow b|c\}$
+* We can also rewrite the solution as $P = \{S \rightarrow aSXX|aXX, \ X \rightarrow b|c\}$
+
+
+
+## given $I = \{a, b\}$ and $w = \{abbab\}$
+
+* $F_1 = \forall x (a(x))$ is **false** for $w$, which means $w$ is **NOT a model** for $F_1$ , represents as $w \not\models F_1$
+* $F_2 = \exists x(a(x))$ is **true** for $w$, whichi mean $w$ is **a model** for $F_2$ , represents as $w \models F_2$
+* $F_3 = \forall x \exists y(x < y \land (a(x) \rightarrow b(y)))$ is **true** for $w$, which means $w$ is **a model** for $F_3$ , represents as $w \models F_2$
+
+
+
+## given $L(F) = \{w \in I^* \ | \ w \models F\}$
+
+* $F_1 = \forall x(a(x))$ implies $L(F_1) = a^*$
+* $F_2 = \forall x(a(x) \land \neg a(x))$ implies $L(F_2) = \varepsilon$
+* $F_3 = \exists x(a(x) \land \neg a(x)$ implies $L(F_3) = \empty$
+* $F_4 = \exists x(a(x) \lor \neg a(x))$ implies $L(F_4) = I^+$
+* $F_5 = \forall x(a(x) \lor \neg a(x))$ implies $L(F_5) = I^*$
+
+
+
+## $L$ is star-free which the words starting with $a$ , ending with $b$ over $I=\{a, b\}$ , find a MFO formula $F$ such that $L(F)=L$
+
+$F = \forall x(\text{if} \ x \ \text{is the first position then there is an}\ a \ \text{in that position, and if} \ x \ \text{is the last position then there is a}\ b \ \text{in that position}) \\ = \forall x((\neg \exists y(y < x) \rightarrow a(x)) \land (\neg \exists y(x < y) \rightarrow b(x)))$
+
+* $\neg \exists y(y < x)$ : It indicates $x$ is the first position
+	* **Short hand**: $first(x) = \neg \exists y(y < x)$
+* $\neg \exists y(x < y)$ : It indicates $x$ is the last postion
+	* **Short hand**: $last(x) = \neg \exists y(x < y)$
+
+So the formula can be replaced as: $\forall x(first(x) \rightarrow a(x)) \land (last(x) \rightarrow b(x)))$
+
+
+
+## $L$ is star-free which the words over $\{a, b\}$ in which occur exactly two $b$'s in the second and second to last position, find a MFO formula $F$ such that $L(F)=L$
+
+e.g., $bb \in L$ , $aba \not\in L$ , $abba \in L$ , $ababa \in L$, so the language can be expressed as $L = aba^*ba + bb = ab\overline{\overline{\empty}b\overline{\empty}} + bb$
+
+* $\overline{\empty}b\overline{\empty}$ : There is at least one $b$ in the string, implies $\overline{\overline{\empty}b\overline{\empty}}=a^*$ : there is no $b$ in the string
+
+The formula can be $F = \forall x \forall y ( \\ (x=1 \land y=last(y+1) \land x<y) \rightarrow (b(x) \land b(y) \land \forall z( (z \neq x \lor z \neq y) \rightarrow a(z) )) \land (\forall x(last(x) \rightarrow x\geq3) \\ \lor \\ (\forall x(last(x) \rightarrow (x=1 \land b(x) \land b(x-1)) ) \\ )$
+
+
+
+* $(x=1 \land y=last(y+1) \land x<y) \rightarrow (b(x) \land b(y) \land \forall z( (z \neq x \lor z \neq y) \rightarrow a(z) )) \land (\forall x(last(x) \rightarrow x\geq3)$ accepts $b\overline{\overline{\empty}b\overline{\empty}}$
+* $(\forall x(last(x) \rightarrow (x=1 \land b(x) \land b(x-1)) )$ accepts $bb$
+
+
+
+
+
