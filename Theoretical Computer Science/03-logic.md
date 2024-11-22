@@ -1,4 +1,4 @@
-# A Logic to define Languages: MFO
+# Monadic First-order Logic (MFO)
 
 * **Objective**: The aim is to use a form of first-order logic (specifically Monadic First-Order Logic) to define languages over an alphabet $I$ 
 	* **Monadic**: This refers to predicates that take only one argument, hence the term “monadic.”
@@ -73,7 +73,7 @@
 
 
 
-# Semantics
+# MFO Semantics
 
 * The symbol $\models$ , called the **satisfaction relation** or **semantic entailment**, is used in logic to indicate that a certain formula (or statement) is true in a given interpretation
 	* When we write something like $w, v_1 \models \varphi$ , it means that the formula $\varphi$ is **true** or **satisfied** in the word $w$ under the assignment $v_1$
@@ -191,6 +191,148 @@
     * $\forall x (\neg a(x) \land \neg b(x))$ : Ensures no positions in the word contain any other characters (used to rule out the possibility of words that don’t match the pattern). In other words, this condition is true if the word is empty (contains neither “a” nor “b”)
 
     This formula captures the idea of alternating “a” and “b” throughout the word, beginning with “a” and ending with “b”
+
+
+
+# Monadic Second-order Logic (MSO)
+
+* **Quantification on Positions**: 
+
+	* In **first-order logic**, quantification is limited to individual positions within a structure (e.g., characters in a string or nodes in a graph). This is useful but limited in expressiveness when it comes to capturing patterns in regular languages.
+
+* **Second-order Quantification**:
+
+	* **Second-order logic** allows quantification over **sets of positions** rather than individual positions.
+
+	* These sets of positions are defined using **monadic predicates**. A **monadic predicate** is a function that takes a single argument (a position in this case) and returns true or false. For instance, if $P(x)$ is a monadic predicate, it holds (is true) if $x$ belongs to the set defined by $P$ . So, $P(x)$ can indicate, for example, whether $x$ is a vowel in a string.
+
+* **Formulae with Second-order Quantification**:
+
+	* With second-order logic, you can have formulae like $\exists P(\varphi)$ , where $P$ is a set (a monadic predicate) and $\varphi$ is a formula that depends on this set $P$ .
+
+	* This additional layer of quantification (over sets rather than positions) allows MSO to express more complex properties of languages, which are essential for fully characterizing **regular languages**.
+
+* **Conventions**:
+	* **capital letters** (e.g., $P$ ) will represent variables that denote **monadic predicates** (sets of positions), while **lower-case letters** will represent variables over individual **positions**.
+
+
+
+# MSO Semantics
+
+* **Assignment for Second-order Variables**:
+
+	* Second-order variables (denoted by the set $V_2$ ) are assigned using a function $v_2$ .
+
+	* The function $v_2: V_2 \rightarrow \wp([0..|w|-1])$ maps each second-order variable (like a monadic predicate $X$ ) to a subset of positions in the domain $[0..|w|-1]$ , where $|w|$ represents the length of the string $w$ .
+
+* **Semantics of MSO Expressions**: Two new rules are added to the semantics of **Monadic First-order Logic (MFO)** (the simpler logic only quantifying over individual positions) to handle second-order quantification over sets:
+
+	* **First Rule**: $w$, $v_1$, $v_2 \models X(x)$ 
+
+		* This expression means that $X(x)$ is true in the interpretation where:
+			* $w$ is the structure (usually a string or sequence).
+			* $v_1$ assigns values to first-order variables (individual positions).
+			* $v_2$ assigns values to second-order variables (sets of positions).
+
+		* **Interpretation**: $X(x)$ holds if $v_1(x) \in v_2(X)$ ; in other words, the position assigned to $x$ by $v_1$ is included in the set assigned to $X$ by $v_2$ .
+
+	* **Second Rule**: $w$, $v_1$, $v_2 \models \exists X(\varphi)$
+
+		* This expression means that there exists a set $S \subseteq [0..|w|-1]$ such that the formula $\varphi$ is true when $X$ is assigned the set $S$ .
+
+		* **Interpretation**: There exists a subset $S$ of positions in $w$ such that when $v_2$ is modified to assign $S$ to $X$ (notated $v_2[S/X]$ ), the formula $\varphi$ holds.
+			* $v_2[S/X]$ denotes a modified assignment function where $X$ is mapped to the set $S$ while all other second-order variables are mapped as before. This allows us to interpret expressions that use existential quantification over sets.
+
+* **Monadic Second-order Logic (MSO) formula** that defines the language $L_p = \{ aa \}^*$ : $\exists P (\forall x (\neg P(0) \land (\neg P(x) \leftrightarrow P(x+1)) \land a(x) \land (\text{last}(x) \rightarrow P(x))))$
+
+	* **Existential Quantification** ( $\exists P$ ):
+
+		* The formula starts with $\exists P$ , indicating that there exists a monadic predicate $P$ , which we will use to identify certain positions in the string.
+
+	* **Conditions Within the Formula**:
+
+		* $\forall x (\neg P(0) \land (\neg P(x) \leftrightarrow P(x+1)) \land a(x) \land (\text{last}(x) \rightarrow P(x)))$ :
+			* This is a statement that applies to every position x in the string.
+
+		* $\neg P(0)$ :
+
+			* This means that $P$ does not hold at position $0$, which is the starting position in the string.
+
+			* Since the note specifies that $P$ is used to identify odd positions (starting from $0$), this initialization ensures that $P$ correctly identifies positions based on a specific pattern.
+
+		* $\neg P(x) \leftrightarrow P(x+1)$ :
+
+			* This establishes an alternating pattern for $P$ , where $P(x)$ is true for odd positions and false for even positions, or vice versa.
+
+			* This alternation is important for capturing the pattern required for the language $\{ aa \}^*$ , where “$a$” occurs in pairs.
+
+		* $a(x)$ :
+
+			* This condition states that each position $x$ must contain the character “$a$”.
+
+			* This ensures that the string is made up entirely of “$a$” characters.
+
+		* $\text{last}(x) \rightarrow P(x)$ :
+
+			* This implies that if $x$ is the last position in the string, then $P(x)$ must hold.
+
+			* This condition helps in ensuring that the string length is even, as the last position (in an alternating sequence starting with $\neg P$ ) must satisfy $P$ .
+
+
+
+# From FSA to MSO
+
+<img src="assets/image-20241110215356113.png" alt="image-20241110215356113" style="zoom: 50%; margin-left: 0" />
+
+* **Second-order Quantification**:
+
+	* The formula begins with $\exists Q_0, Q_1, Q_2$ , indicating there are second-order predicates $Q_0$ , $Q_1$ , and $Q_2$ . Each of these predicates represents a state in the FSA (states $q_0$ , $q_1$ , and $q_2$ , respectively).
+
+	* By defining these predicates, we can specify which positions in a string correspond to each state.
+
+* **Constraints on State Assignments**:
+
+	* $\forall z (\neg(Q_0(z) \land Q_1(z)) \land \neg(Q_0(z) \land Q_2(z)) \land \neg(Q_1(z) \land Q_2(z)))$ : This part of the formula ensures that each position $z$ is assigned to exactly one state. No position can belong to more than one state at a time.
+
+	* $Q_0(0)$ : This specifies that the initial position (position $0$) is in the state $q_0$ , which corresponds to the start state of the automaton.
+
+* **State Transition Conditions**: 
+
+	* The formula then uses a universal quantifier $\forall x$ to express the state transitions for each position $x$ (except the last position, handled separately).
+
+	* $\neg \text{last}(x) \rightarrow (\ldots)$ : This condition applies to all positions except the last one, ensuring that the transitions align with the FSA’s structure. The transitions are defined as follows:
+
+		* $Q_0(x) \land c(x) \land Q_0(x+1)$ : If the automaton is in state $q_0$ and reads $c$ , it stays in $q_0$
+
+		* $Q_0(x) \land b(x) \land Q_1(x+1)$ : If in $q_0$ and reads $b$ , it moves to $q_1$
+
+		* $Q_0(x) \land a(x) \land Q_2(x+1)$ : If in $q_0$ and reads $a$ , it moves to $q_2$
+
+		* $Q_1(x) \land a(x) \land Q_2(x+1)$ : If in $q_1$ and reads $a$ , it moves to $q_2$
+
+		* $Q_2(x) \land c(x) \land Q_0(x+1)$ : If in $q_2$ and reads $c$ , it returns to $q_0$
+
+		* $Q_2(x) \land a(x) \land Q_2(x+1)$ : If in $q_2$ and reads $a$ , it stays in $q_2$
+
+	* These conditions specify the state-to-state transitions according to the automaton’s structure.
+
+
+
+# From MSO to FSA
+
+* **From MSO to FSA**:
+
+	* For any given MSO formula $\varphi$ , it is possible to construct an FSA that recognizes the language $L(\varphi)$ defined by that formula.
+
+	* This connection is established by the **Büchi-Elgot-Trakhtenbrot Theorem**. This theorem proves that the expressive power of MSO over finite strings is equivalent to the class of languages recognized by FSAs, which are the regular languages.
+
+* **MSO and Regular Languages**:
+
+	* The theorem implies that **MSO defines exactly the class of regular languages**. This means that any language that can be described by an MSO formula can also be recognized by an FSA, and vice versa.
+
+	* This equivalence is fundamental in theoretical computer science as it links formal logic (MSO) with automata theory (FSA) and provides a logical framework to understand regular languages.
+
+
 
 
 

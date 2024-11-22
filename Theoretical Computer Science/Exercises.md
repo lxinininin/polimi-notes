@@ -782,7 +782,7 @@ We can recognise the language as **NDPA**, so it can be expressed as **CF** gram
 
 
 
-## given $I = \{a, b\}$ and $w = \{abbab\}$
+## Given $I = \{a, b\}$ and $w = \{abbab\}$
 
 * $F_1 = \forall x (a(x))$ is **false** for $w$, which means $w$ is **NOT a model** for $F_1$ , represents as $w \not\models F_1$
 * $F_2 = \exists x(a(x))$ is **true** for $w$, whichi mean $w$ is **a model** for $F_2$ , represents as $w \models F_2$
@@ -790,7 +790,7 @@ We can recognise the language as **NDPA**, so it can be expressed as **CF** gram
 
 
 
-## given $L(F) = \{w \in I^* \ | \ w \models F\}$
+## Given $L(F) = \{w \in I^* \ | \ w \models F\}$
 
 * $F_1 = \forall x(a(x))$ implies $L(F_1) = a^*$
 * $F_2 = \forall x(a(x) \land \neg a(x))$ implies $L(F_2) = \varepsilon$
@@ -828,5 +828,160 @@ The formula can be $F = \forall x \forall y ( \\ (x=1 \land y=last(y+1) \land x<
 
 
 
+# Ex 7: Quantification over monodic predicates & Computability
+
+## Alphabet $I = \{a, b\}$ 
+
+### $L_1 = a a^*b^*$
+
+A MFO formula will suffice: $a(0) \land \forall x \forall y((a(x) \land b(y)) \rightarrow x < y)$
 
 
+
+### $L_2 = \{w \in I^* \ | \ \text{there is an 'a' in every even positions in w}\}$
+
+The first position of $L_2$ corresponds index 0, so the language can be expressed as $(a(a+b))^*(a+\varepsilon)$
+
+We need a monadic predicate $P$ ($P$ is a set of positions) that is true over all even positions (If $x$ is an even position, then $x \in P$): $P(0) \land \forall x \forall y ((P(x) \land y = x + 2) \rightarrow P(y))$
+
+We can define $L2$ as: $\exists P(P(0) \land \forall x \forall y ((P(x) \land y = x + 2) \rightarrow P(y)) \land (\forall z (P(z) \rightarrow a(z))))$
+
+* Consider $w = abaaa$, $P$ can be $\{0,2,4\}$, also $\{0,2,3,4\}$
+
+
+
+### $L_3 = \{w \in I^* \ | \ \#_a(w) \ \text{is even}\}$
+
+$L_3$ is regular because it can be recognized by FA:
+
+```mermaid
+stateDiagram
+	direction LR
+	[*] --> q0
+	q0 --> q0 : b
+	q0 --> q1 : a
+	q1 --> q0 : a
+	q1 --> q1 : b
+	q0 --> [*]
+```
+
+But is it not star-free, so we can not find MFO formula for $L_3$, but we can find MSO formula for it
+
+
+
+#### **Some useful short hand**: e.g., $P = \{0,3,4,7\}$
+
+* $First(x, P) = P(x) \land \forall y (y < x \rightarrow \neg P(y))$
+	* $x$: position
+	* $P$: set of positions
+	* $First(x, P)$ if and only if $x$ is the first position in $P$
+		* $First(0,P)$ is true
+* $Last(x, P) = P(x) \land \forall y (x < y \rightarrow \neg P(y))$
+	* $Last(x, P)$ if and only if $x$ is the last position in $P$
+		* $Last(7,P)$ is true
+* $Next(x, y, P) = P(x) \land P(y) \land x < y \land \forall z ((x < z \land z < y) \rightarrow \neg P(z))$
+	* $Next(x, y, P)$ is true if and only if $y$ is the position following $x$ in $P$
+		* $Next(0,4,P)$ is false
+* $Odd(Q, P) = \forall x (Q(x) \leftrightarrow (First(x,P) \lor \exists y \exists z (Next(z,x,P) \land Next(y,z,P) \land Q(y))))$
+	* $Odd(Q, P)$ is true if and only if $Q$ is the subset of $P$ made by the first, third, fifth, ... , position of $P$
+		* $Q = \{0,4\}$ implies $Odd(Q, P)$ is true
+* $OddCard(P) = \exists Q (Odd(Q, P) \land \forall x (Last(x,P) \rightarrow Q(x)) \land \exists x(P(x))$
+	* $\exists x(P(x))$: $P$ is not empty
+	* $OddCard(P)$ is true if and only if the cardinality of $P$ is odd
+		* $Card(P) = 4$ implies $OddCard(P)$ is false
+* $EvenCard(P) = \neg OddCard(P)$
+	* $EvenCard(P)$ is true if and only if the cardinality of $P$ is even
+		* $Card(P) = 4$ implies $EvenCard(P)$ is true
+
+
+
+Then we can define MSO formula of $L_3$ as: $\exists P(EvenCard(P) \land \forall x (P(x) \leftrightarrow a(x)))$
+
+
+
+### $L_4$ : when between each two a's, with no other a in between, there is a block of an odd number of letters b
+
+e.g., $bbb \in L_4$, $babb \in L_4$, $baba \in L_4$, $bbabbbababbbbbabb \in L_4$
+
+The language can be expressed as $L_4 = b^*(a(bb)^*b)^*b^* + b^*a$
+
+The MSO formula for $L_4$ can be defined as: $\forall x \forall y((x < y \land a(x) \land a(y) \land \forall z ((x < z \land z < y) \rightarrow \neg a(z))) \rightarrow \exists P(\forall w(P(w) \leftrightarrow (x < w \land w < y)) \land OddCard(P) )$
+
+* e.g., $abbbbba \in L_4$, first `a` is $x$, last `a` is $y$, the intermediate `b`'s is the set $P$
+
+
+
+## Computability
+
+<img src="assets/image-20241122195017356.png" alt="image-20241122195017356" style="zoom: 40%; margin-left: 0" />
+
+A language $L$ over $I$ is decidable (or recursive) if there exists a TM $m$ that recognizes it:
+
+* If $x \in L$ then $m$ **halts** on input $x$ and prints "YES"
+* If $x \notin L$ then $m$ **halts** on input $x$ and prints "NO"
+
+A function $f: \mathbb{N} \rightarrow \mathbb{N}$ is decidable (or computable) if there exists a TM $m$ with I/O that calculates $f$ : that is if $[x]$ is the encoding of $x \in \mathbb{N}$ , then $m$ produces the string $[y]$ having $[x]$ in input if and only if $f(x)=y$
+
+A decision problem $P$ (a problem such that the answer to each instance is only "YES" or "NO", in this case, it decides if $x \in L$) is decidable if there is a TM $m$ that solves it:
+
+* If $[x]$ is the encoding of an instance of $P$, then
+	*  $P(x)$ is "YES" if and only if $m$ **halts** on $[x]$ and prints "YES"
+	* $P(x)$ is "NO" if and only if $m$ **halts** on $[x]$ and prints "NO"
+
+**Notation**:
+
+* If $P$ is a program of a TM
+	* $P(x) \downarrow$ : denotes that $P$ **halts** on $x$
+	* $P(x) \uparrow$ : denotes that $P$ **does not halts** on $x$
+
+
+
+## HP: Input: the encoding of a TM $m$ and encoding of an input $x$ of $m$, Output: 1 if $m(x) \downarrow$ ; 0 otherwise, prove HP is NOT decidable
+
+Suppose by contradiction that a TM $n$ solves it: that is $n$ calculates the function 
+
+$\varphi ([m,x]) = \begin{cases} 1, \ m(x) \downarrow \\ 0, \ m(x) \uparrow \end{cases}$
+
+* $[m,x]$ : encoding of $m$ and $x$ as a single natural number
+
+We can use $n$ as a part of a TM $n'$ that operates as follow: $n'$ simulates $n$ over the input $[m,m]$ , <u>when $n$ halts if it prints "1", then $n'$ enters an infinite loop ($n'$ does not halt)</u>, otherwise $n'$ prints "1" and halts
+
+$n'$ cannot exist, indeed: $n'([n']) \downarrow$ or $n'([n']) \uparrow$
+
+* If $\boxed{n'([n']) \downarrow}$ , then $\varphi ([n',n']) = 1$, then <u>$n$ halts over $[n',n']$ , but this means that $n'$ enters an infinity loop</u> and so $\boxed{n'([n']) \uparrow}$ , violates !!
+* <u>if $\boxed{n'([n']) \uparrow}$ , then $n$ prints "1"</u>, this means that $\varphi ([n',n']) = 1$, implies $\boxed{n'([n']) \downarrow}$ , violates !!
+
+So we can deduce HP is not decidable
+
+
+
+## $HALT = \{[m] \ | \ m([m]) \downarrow\}$ is not a decidable language
+
+HALT is **semdecidable**: indeed given a TM $m$ and an input $x$ of $m$ , we can simulate with a **universal** TM $m'$ , the computation of $m$ over $x$ , if the simulation ends, then the TM $m'$ prints "YES" and halts, otherwise $m'$ will loop forever
+
+
+
+## $g(y,x) = \begin{cases} 1, \ \text{if} \ m_y(x) \ \text{is even} \\ 0, \ \text{otherwise} \end{cases}$ , prove that $g$ is NOT computable
+
+* $m_y(x) \ \text{is even}$ : meaning the output of the TM with Gödel number $y$ halts over the input $x$ and prints an even number
+
+Consider $h(x) = \begin{cases} 2, \ \text{if } m_x(x) \text{ is NOT even} \\ \perp, \text{otherwise} \end{cases}$
+
+* if $g$ is computable, then also $h$ is computable, indeed $$h(x) = \begin{cases} 2, \ \text{if } g(x,x) = 1 \\ \perp, \text{if } g(x,x) = 0 \end{cases}$$
+
+Suppose by contradiction, let $m_z$ ($z$ is the Gödel number of the TM $m$) a TM (program) that calculates $h$ , which means $h(w) = m_z(w) \ \forall w$
+
+* If $h(z)$ is even ($h(z) = 2$) , then $g(z,z) = 0$ and so $m_z(z)$ is not even, violate !!
+* if $h(z)$ is not even (that is, $h(z) = \perp$), then $g(z,z) = 1$ and so $m_z(z)$ is even, violate !!
+
+
+
+## $g'(y,x) = \begin{cases} 1, \ \text{if} \ m_y(x) \ \text{is even} \\ \perp, \ \text{otherwise} \end{cases}$ , prove that $g'$ is computable
+
+* Different from the previous $g$ , in here, $g'$ is a partial function
+
+$g'$ is computable, indeed, consider an **universal** TM $m$ , given $y$ and $x$ , $m$ can simulate the computation of the TM $m_y$ over $x$ :
+
+* If this simulation ends, then $m$ checks if the output is even
+	* If "YES", $m$ prints "1" and halts
+	* Otherwise, it loops forever
