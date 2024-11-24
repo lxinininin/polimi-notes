@@ -594,3 +594,704 @@ A few simplifications, **without loss of generality**:
 
 	* **Important Caveat:**
 		* While each specific $g(y, x)$ (for fixed $y$, $x$ ) corresponds to a solvable problem, we may not actually know the solution (i.e., whether $g(10, 20) = 1$ or $g(10, 20) = 0$ ).
+
+
+
+# Decidability & Semidecidability
+
+* **Framing Problems as Binary Questions**:
+
+	* Any problem can be phrased as a **yes/no question**: $\text{“Given a set } S \subseteq \mathbb{N} \text{ and an input } x \in \mathbb{N}, \text{ is } x \in S? \text{"}$
+
+	* This formulation allows all problems to be viewed in terms of membership in a set, making them equivalent to language recognition problems.
+
+* **Characteristic Function (Predicate):**
+
+	* The **characteristic function** $c_S(x)$ for a set $S$ is defined as: $c_S(x) = \begin{cases} 1 & \text{if } x \in S, \\ 0 & \text{if } x \notin S. \end{cases}$
+
+		* $c_S(x)$ determines membership in $S$ .
+
+		* By definition, $c_S(x)$ is **total** (it produces a result for any input $x$ ).
+
+* **Decidability and Recursive Sets:**
+
+	* A set $S$ is called **recursive** (or **decidable**) if its characteristic function $c_S(x)$ is computable.
+
+		* The term **decidable** is commonly used in computability theory to describe problems that can be solved by an algorithm.
+		* Similarly, a set $S$ being recursive is just another way of saying its membership problem is decidable.
+
+		* This means there exists a Turing Machine that can compute $c_S(x)$ for any $x$ , determining membership in $S$ in a finite amount of time.
+
+	* **Equivalence**:
+
+		* Saying $S$ is recursive is equivalent to saying the problem of deciding membership in $S$ is solvable.
+
+	* For instance, consider the Halting Problem:
+
+		* The set $S = \{ (y, x) \mid \text{TM } M_y \text{ halts on input } x \}$ represents the halting problem.
+
+		* Determining membership in $S$ is equivalent to solving the Halting Problem.
+
+		* Since the Halting Problem is undecidable, $S$ is not recursive.
+
+* **Definition of Recursively Enumerable (RE) Sets:**
+
+  * A set $S \subseteq \mathbb{N}$ is recursively enumerable (RE) if and only if:
+
+  	* $S$ is the empty set ( $S = \emptyset$ ), or
+
+
+  	* $S$ is the **image** of a total, computable function $g_S$ , called the **generating function** of $S$ : $S = \{x \mid x = g_S(y), y \in \mathbb{N}\}$ 
+
+  * This means that:
+
+  	* $g_S$ enumerates the elements of $S$ , generating $S$ as: $S = \{g_S(0), g_S(1), g_S(2), g_S(3), \dots \}$.
+
+  	* The term “recursively enumerable” reflects the fact that S can be **algorithmically enumerated** by $g_S$ .
+
+* **Semidecidability:**
+
+	* The term “semidecidable” reflects the behavior of Turing Machines for RE sets:
+
+		* **Membership in** $S$ **:**
+			* If $x \in S$ , then $g_S$ will eventually produce $x$ during enumeration. Hence, we can **confirm membership** with a “yes.”
+
+	
+		* **Non-membership in** $S$ **:**
+			* If $x \notin S$ , the enumeration procedure does not terminate, meaning we cannot definitively say $x \notin S$ . The procedure may continue indefinitely.
+	
+
+	* Thus, $S$ is semidecidable because:
+
+		* A Turing Machine can confirm membership for $x \in S$ .
+	
+	
+		* But for $x \notin S$ , it cannot provide a definitive “no.”
+	
+	* The concept of RE sets applies to many undecidable problems:
+	
+		* The Halting Problem is a classic example of an RE set:
+	
+			* The set $S = \{(y, x) \mid \text{TM } M_y \text{ halts on input } x \}$ is RE.
+	
+			* If a TM halts, you can confirm it.
+	
+			* If a TM does not halt, you cannot confirm non-membership.
+
+
+
+# Theorem
+
+* **A) If** $S$ **is recursive (decidable), it is also RE (semidecidable).**
+
+	* Recursive (decidable) sets are more than semidecidable; they allow us to decide both membership ( $x \in S$ ) and non-membership ( $x \notin S$ ) in finite time.
+
+	* A recursive set $S$ has a characteristic function $c_S(x)$ that is computable, meaning:
+
+		* $c_S(x) = 1$ if $x \in S$ ,
+
+		* $c_S(x) = 0$ if $x \notin S$ .
+
+	* Since RE only requires confirming membership ( $x \in S$ ) by enumeration, all recursive sets are trivially RE.
+
+* **B)** $S$ **is recursive if and only if both** $S$ **and its complement** $S^c = \mathbb{N} - S$ **are RE.**
+
+	* For a set to be recursive, it must be possible to:
+		1. Confirm membership ( $x \in S$ ).
+		2. Confirm non-membership ( $x \notin S$ ).
+
+	* If both $S$ and $S^c$ are RE:
+
+		* Membership ( $x \in S$ ) can be confirmed by enumerating $S$ .
+
+		* Non-membership ( $x \notin S$ ) can be confirmed by enumerating $S^c$ .
+		* This dual confirmation means $S$ is recursive.
+
+* **Corollary:**
+
+	* The class of recursive (decidable) sets is **closed under complement**:
+		* If $S$ is recursive, then $S^c$ is also recursive.
+		* Decidability guarantees that both membership and non-membership are algorithmically determinable.
+
+
+
+## Proof A
+
+* **Base Case:** $S = \emptyset$ **:**
+
+	* If $S$ is the empty set, it is trivially RE.
+
+		* A generating function $g_S$ does not enumerate any elements, as there are none to enumerate.
+
+		* Thus, $S = \emptyset$ satisfies the conditions of an RE set.
+
+* **Non-Empty Case:** $S \neq \emptyset$ **:**
+
+	* Assume $S \neq \emptyset$ .
+
+	* Let $c_S$ denote the **characteristic predicate** of $S$ :
+
+		* $c_S(x) = 1$ if $x \in S$ ,
+
+		* $c_S(x) = 0$ if $x \notin S$ .
+
+		* Since $S$ is recursive, $c_S$ is computable.
+
+	* Since $S \neq \emptyset$ , there exists some $k \in S$ such that $c_S(k) = 1$ .
+
+* **Defining the Generating Function** $g_S$ **:**
+
+	* Define $g_S(x)$ as follows: $g_S(x) = \begin{cases} x & \text{if } c_S(x) = 1 \ (\text{if } x \in S), \\ k & \text{otherwise}, \end{cases}$
+		* where $k$ is an element of $S$ (from the assumption that $S \neq \emptyset$ ).
+
+* **Properties of** $g_S$ **:**
+
+	* $g_S$ is:
+
+		* **Total**: Defined for all $x \in \mathbb{N}$ .
+
+		* **Computable**: Since $c_S(x)$ is computable, $g_S(x)$ is computable.
+
+	* The image of $g_S$ is $S$ :
+		* $g_S$ enumerates all elements of $S$ and only elements of $S$ .
+
+* **Conclusion:**
+
+	* $g_S$ meets the definition of a generating function for recursively enumerable sets.
+
+	* Hence, $S$ is RE.
+
+* **Notes:**
+
+	* **Non-constructive Nature of the Proof:**
+
+		* The proof assumes the existence of at least one $k \in S$ without providing a way to construct $k$ .
+
+		* If $S \neq \emptyset$ , such a $k$ must exist. This is sufficient for proving the result without needing to explicitly find $k$ .
+
+
+
+## Proof B
+
+* **B.1) If** $S$ **is recursive, then** $S$ **and** $S^c$ **are RE:**
+
+	* $S$ **is recursive implies** $S$ **is RE:**
+		* This was already proven in part **A** of the theorem. Since $S$ is recursive, its characteristic function $c_S(x)$ is computable, allowing enumeration of $S$ .
+
+	* $S$ **is recursive implies** $S^c$ **is RE:**
+
+		* The complement $S^c$ has the characteristic function: $c_{S^c}(x) = \begin{cases} 1 & \text{if } x \notin S, \\ 0 & \text{if } x \in S. \end{cases}$
+
+		* Since $S$ is recursive, $c_S(x)$ is computable, and $c_{S^c}(x) = 1 - c_S(x)$ is also computable.
+
+		* Using $c_{S^c}(x)$ , we can construct an enumeration for $S^c$ , making $S^c$ RE.
+
+* **B.2) If** $S$ **and** $S^c$ **are RE, then** $S$ **is recursive:**
+
+	* **Enumerations for** $S$ **and** $S^c$ **:**
+		* Since $S$ and $S^c$ are RE, we can construct generating functions $g_S$ and $g_{S^c}$ such that: $S = \{g_S(0), g_S(1), g_S(2), \dots\}, \quad S^c = \{g_{S^c}(0), g_{S^c}(1), g_{S^c}(2), \dots\}$.
+
+	* **Relationship Between** S **and** S^c **:**
+
+		* By definition, $S \cup S^c = \mathbb{N}$ (every element belongs to $S$ or $S^c$ ), and $S \cap S^c = \emptyset$ (no element belongs to both).
+
+		* This ensures that each $x \in \mathbb{N}$ belongs to exactly one of $S$ or $S^c$ .
+
+	* **Interleaving Enumerations:**
+
+		* Create a combined enumeration that alternates between $g_S$ and $g_{S^c}$ : $g_{\text{combined}}(x) = \begin{cases} g_S(n) & \text{if } x = 2n, \\ g_{S^c}(n) & \text{if } x = 2n + 1. \end{cases}$
+
+		* This combined enumeration allows us to determine $x \in S$ or $x \in S^c$ based on the enumeration’s structure:
+
+			* $x \in S$ if it appears in an **even position**.
+
+			* $x \in S^c$ if it appears in an **odd position**.
+
+	* **Decidability of** $S$ **:**
+
+		* Given $x \in \mathbb{N}$ , we can compute whether $x$ belongs to $S$ or $S^c$ by analyzing the combined enumeration.
+
+		* Since membership and non-membership can both be confirmed, $S$ is recursive.
+
+
+
+# Other Important Results
+
+* **Characterization of RE Sets:**
+
+	* **RE Sets via Partial Computable Functions**:
+		* A set $S$ is recursively enumerable (RE) if and only if: $S = D_h = \{x \mid h(x) \neq \perp\}$
+			* $h$ is a partial computable function (i.e., $h$ may not be defined for all $x$ ).
+	* **RE Sets via Images of Computable Functions**:
+		* $A$ set $S$ is RE if and only if: $S = I_g = \{x \mid \exists y \in \mathbb{N} : x = g(y)\}$
+			* $g$ is a total, computable function. Here, $g$ generates or enumerates $S$ .
+
+	These two characterizations highlight different perspectives on RE sets:
+
+	* $D_h$ : Membership is determined by whether $h(x)$ halts.
+
+	* $I_g$ : Membership is determined by whether $x$ can be enumerated by $g(y)$ .
+
+* **Languages Recognized/Accepted by Turing Machines:**
+
+	* RE sets characterize the languages that are **recognized** or **accepted** by Turing Machines:
+		* A Turing Machine recognizes/accepts a language if it halts on all inputs in the language ( $x \in S$ ) but may loop indefinitely for inputs not in the language ( $x \notin S$ ).
+
+	* **Difference Between Recognize/Accept and Decide:**
+
+		* **Decide**: The Turing Machine halts for all inputs, providing a definitive “yes” or “no.”
+
+		* **Recognize/Accept**: The Turing Machine halts only for inputs in the language ( $x \in S$ ) and may loop indefinitely otherwise.
+
+* **Semidecidable Sets That Are Not Decidable:**
+
+	* Some sets are semidecidable but not decidable. For example:
+
+		* Define $K = \{x \mid f_x(x) \neq \perp\}$ , where $f_x(x)$ is a partial computable function.
+
+		* $K$ is semidecidable because:
+
+			* A Turing Machine can confirm membership ( $x \in K$ ) by determining whether $f_x(x)$ halts.
+
+			* This aligns with the characterization $K = D_h$ , where $h(x) = f_x(x)$ .
+
+	* **Why** $K$ **is Not Decidable**:
+
+		* The characteristic function $c_K(x)$ : $c_K(x) = \begin{cases} 1 & \text{if } f_x(x) \neq \perp, \\ 0 & \text{if } f_x(x) = \perp, \end{cases}$
+
+			is not computable, as it would require solving the Halting Problem (undecidable).
+
+
+
+<img src="assets/image-20241123235332075.png" alt="image-20241123235332075" style="zoom:25%; margin-left: 0" />
+
+* **Set Hierarchies**:
+
+	* **Recursive Sets**:
+		* These are the decidable sets where membership ( $x \in S$ ) and non-membership ( $x \notin S$ ) can both be determined in finite time.
+
+	* **RE Sets**:
+		* These are the semidecidable sets where membership ( $x \in S$ ) can be confirmed, but non-membership ( $x \notin S$ ) may not always be verifiable.
+
+	* $\mathbb{N}$ :
+		* Represents the universal set of natural numbers, which contains all recursive and RE sets.
+
+* **Inclusions are Strict**:
+
+	* Every recursive set is also RE, but not every RE set is recursive.
+		* **Why?** RE sets allow for indefinite loops for non-membership, whereas recursive sets require a decision for every input.
+
+* **Complements of Sets:**
+
+	* **Recursive Complements**:
+		* If $S$ is recursive, its complement $S^c$ is also recursive.
+			* Recursive sets are **closed under complement**.
+
+	* **RE Complements**:
+
+		* If $S$ is RE, its complement $S^c$ may or may not be RE.
+
+			* The Halting Problem ( $S$ ) is RE (we can confirm halting).
+
+			* Its complement ( $S^c$ , where TMs do not halt) is **not RE**, as we cannot confirm non-halting in general.
+
+* **Corollary:**
+
+	* **The Class of RE Sets is Not Closed Under Complement**:
+		* If RE sets were closed under complement, then every RE set $S$ and its complement $S^c$ would both be RE.
+		* This would imply $S$ is recursive (since decidable sets require membership and non-membership to be verifiable).
+		* However, not all RE sets are recursive, proving that RE sets are **not closed under complement**.
+
+
+
+# Undecidability of the Halting Problem as a Key to R $\neq$ RE
+
+* **Importance of the Halting Problem:**
+
+	* The undecidability of the Halting Problem is not a “bizarre anomaly”; it is a **fundamental fact** of computation.
+
+	* It serves as the basis for differentiating recursive sets (R) from recursively enumerable (RE) sets.
+
+* **Theorem: If Halting Were Decidable, Then R = RE:**
+
+	* **Statement:** 
+
+		* If the Halting Problem were decidable, the distinction between recursive and recursively enumerable sets would collapse, i.e., R = RE .
+
+	* **Proof:**
+
+		* **Assume** $S$ **is semidecidable (RE):**
+
+			* There exists a Turing Machine $M_S$ that semidecides $S$ :
+
+				* $M_S$ halts and accepts $x$ if $x \in S$ .
+
+				* $M_S$ does not halt if $x \notin S$ .
+
+		* **Assume Halting is Decidable:**
+
+			* If the Halting Problem were decidable, we could determine in advance whether $M_S$ halts on input $x$ without running $M_S$ .
+
+		* **Using the Decidability of Halting:**
+
+			* For any $x$ :
+
+				* If $M_S$ halts on $x$ , conclude $x \in S$ (accept $x$ ).
+
+				* If $M_S$ does not halt on $x$ , conclude $x \notin S$ (reject $x$ ).
+
+		* **Implication:**
+
+			* If Halting were decidable, $M_S$ would effectively decide $S$ , making $S$ recursive.
+
+			* Hence, every RE set would also be recursive, collapsing the distinction between R and RE .
+
+
+
+# The Mighty Rice Theorem
+
+* **Statement of Rice’s Theorem:**
+
+	* Let $F$ be a set of computable functions.
+
+	* Define $S$ as the set of indices of Turing Machines that compute functions in $F$ : $S = \{x \mid f_x \in F\}$,
+		* $f_x$ is the function computed by the Turing Machine with index $x$ .
+
+	* **Rice’s Theorem** states:
+
+		* $S$ is decidable **if and only if**:
+			1. $F = \emptyset$ (i.e., $S$ is empty), or
+			2. $F$ is the set of all computable functions.
+
+		* For **all other cases** (where $F$ is neither empty nor includes all computable functions), $S$ is **not decidable**.
+
+* **Implications of Rice’s Theorem:**
+
+	* **Non-Trivial Cases are Undecidable**:
+
+		* If there exist some functions $f \in F$ and others $f \notin F$ , then $S$ is not decidable.
+
+		* This includes almost all interesting properties of functions, making them undecidable.
+
+	* **Examples of Undecidable Problems**:
+
+		* **Program Correctness**:
+
+			* Given a problem $P$ and a program $M_p$ , determine if $M_p$ solves $P$ .
+
+			* This corresponds to checking if $f_{M_p} \in F$ , where $F$ is the set of correct solutions for $P$ .
+
+		* **Program Equivalence**:
+			* Given two programs $M_x$ and $M_y$ , determine if they compute the same function.
+			* This corresponds to checking if $f_x = f_y$ , which is undecidable.
+
+		* **Specific Properties of Programs**:
+
+			* Does a program produce a function with only even values?
+
+			* Does a program have a limited range (e.g., outputs only a finite set of values)?
+
+			* These questions correspond to specific subsets $F$ of functions and are undecidable by Rice’s theorem.
+
+* **Why is this Important?:**
+
+	* Rice’s theorem highlights the fundamental limitations of computability:
+
+		* It shows that we cannot, in general, decide whether a program has a specific property, unless that property is trivial (applies to all or no programs).
+
+		* This applies to any non-trivial semantic property of the function computed by a Turing Machine.
+
+* **Practical Consequences:**
+
+	* Many interesting questions in software engineering and program analysis are undecidable due to Rice’s theorem:
+
+		* Can we verify that a program is free of bugs?
+
+		* Can we determine whether two programs are equivalent in behavior?
+
+		* Can we guarantee that a program adheres to a given specification?
+
+	* These problems often require approximations or heuristics because exact solutions are impossible.
+
+
+
+# How can we, in practice, determine that a problem/set is (semi)decidable or not
+
+* **Decidability and Semidecidability:**
+
+	* **Decidable**:
+		* If you can find an **algorithm that always terminates** (whether the answer is yes or no), the problem is decidable.
+
+	* **Semidecidable**:
+		* If you can find an **algorithm that may not terminate**, but it **always terminates when the answer is positive (yes)**, the problem is semidecidable.
+
+* **Proving Undecidability or Non-Semidecidability:**
+
+	* When you suspect a problem is **not decidable** or **not semidecidable**, proving this can be challenging.
+
+	* The naive approach of creating a new diagonal proof for each problem is inefficient.
+
+* **Easier Methods:**
+
+	* **Rice’s Theorem**:
+
+		* A powerful and general tool for proving undecidability.
+
+		* Applicable to a wide range of problems related to the properties of computable functions (e.g., software features or program behavior).
+
+		* It simplifies the process by showing that any non-trivial semantic property of a program is undecidable.
+
+	* **Other General Technique**:
+
+		* **Reductions**:
+
+			* Reducing a known undecidable problem (e.g., the Halting Problem) to the problem in question.
+
+			* This proves that solving the new problem would also solve the undecidable problem, establishing undecidability.
+
+
+
+## Problem Reduction
+
+* **Definition of Problem Reduction:**
+
+	* Problem $P'$ is **reducible** to problem $P$ if solving $P$ allows us to solve $P'$ .
+
+	* This is achieved through an **algorithmic transformation**:
+
+		* Given an instance of $P'$ , we algorithmically produce an instance of $P$ .
+
+		* The solution of $P$ is then used to derive the solution of $P'$ .
+
+* **Trivial Example:**
+
+	* **Multiplication Reduced to Basic Arithmetic**:
+
+		* The product $a \times b$ can be computed using only:
+
+			* Addition, subtraction, squaring, and division by 2.
+
+			* Using the formula: $a \times b = \frac{(a + b)^2 - a^2 - b^2}{2}$,
+
+			multiplication is reduced to operations in the set $\{ \text{sum, difference, square, divide by 2} \}$ .
+
+* **General Description:**
+
+	* **Reduction Process**:
+
+		* Start with an instance of problem $P'$ .
+
+		* Transform it into an instance of $P$ using a **computable function** $t(x)$ .
+
+		* Solve the transformed problem using an algorithm for $P$ .
+
+		* Use the solution of $P$ to derive the solution for $P'$ .
+
+	* **Set Inclusion Formulation**:
+
+		* Suppose we want to determine whether $x \in S'$ , but solving $S'$ is difficult or unknown.
+
+		* If we can transform $x$ into $t(x)$ , such that: $x \in S' \iff t(x) \in S$, and $S$ is already solvable, then $P'$ has been reduced to $P$ .
+
+		* This establishes that solving $P$ implies we can solve $P'$ .
+
+	* **Decidability Transfer**:
+		* If $P$ is decidable, and $P'$ reduces to $P$ , then $P'$ is also decidable.
+			* Denoted as: $\text{Dec}(S) \to \text{Dec}(S')$.
+
+* **Reduction in Reverse: Proving Undecidability**
+
+	* Reduction can also be used to show that a problem $S$ is **not decidable**:
+
+		* Start with a problem $S'$ that is known to be undecidable ( $\neg \text{Dec}(S')$ ).
+
+		* Show that solving $S$ would allow us to solve $S'$ ($\text{Dec}(S) \rightarrow \text{Dec}(S')$) :
+			* Define a **computable total function** $t$ such that: $y \in S' \iff t(y) \in S$.
+
+		* If $S$ were decidable, then $S'$ would also be decidable (contradicting $\neg \text{Dec}(S')$ ).
+
+		* Therefore, $S$ is also undecidable ( $\text{Dec}(S) \rightarrow \text{Dec}(S')$ hence $\neg \text{Dec}(S') \rightarrow \neg \text{Dec}(S)$ ).
+
+* **Example: Undecidability of Program Termination**
+
+	* Using the Halting Problem as a known undecidable problem, we can infer the undecidability of termination for other systems:
+
+		* Consider a Turing Machine $M_y$ and an integer $x$ .
+
+		* Build a C program $P$ that simulates $M_y$ and stores $x$ in an input file $f$ .
+
+		* The program $P$ terminates its computation on $f$ if and only if $f_y(x) \neq \perp$ (i.e., $M_y$ halts on $x$ ).
+
+	* **Reduction**:
+
+		* If we could decide whether $P$ terminates on $f$ , we could also solve the Halting Problem for $M_y$ on $x$ .
+
+		* Since the Halting Problem is undecidable, it follows that determining whether $P$ terminates is also undecidable.
+
+
+
+### Reduction is a general, powerful technique
+
+Is the problem “**Does a generic program** $P$ **access an uninitialized variable?**” decidable?
+
+* **Assumption**:
+
+	* Assume that the problem of diagnosing uninitialized variable access is **decidable**.
+
+* **Reduction from the Halting Problem**:
+
+	* The Halting Problem is known to be undecidable. If we can reduce the Halting Problem to the uninitialized variable problem, then the uninitialized variable problem must also be undecidable.
+
+	* Consider a program $P$ that represents an instance of the Halting Problem.
+
+* **Transforming the Halting Problem into the Uninitialized Variable Problem**:
+
+	* Construct a new program $P^\wedge$ based on $P$ :
+
+		```c
+		begin var x, y: ...
+		P;  // Execute program P
+		y := x;  // Access an uninitialized variable
+		end
+		```
+
+		* Variables `x` and `y` are newly introduced and are not used in $P$ .
+
+		* After $P$ finishes, the statement `y := x` attempts to assign the uninitialized value of `x` to `y` .
+		* The assignment `y := x` in $P^\wedge$ results in accessing an uninitialized variable `x` **if and only if** `P` terminates.
+		* Thus, solving the uninitialized variable problem for $P^\wedge$ would solve the Halting Problem for $P$ .
+
+* **Contradiction**:
+
+	* If the uninitialized variable problem were decidable, the Halting Problem would also be decidable.
+
+	* Since the Halting Problem is undecidable, the uninitialized variable problem must also be undecidable.
+
+
+
+**Reduction techniques** can show that determining certain runtime properties of programs is undecidable, similar to the way undecidability of the Halting Problem is proven.
+
+* **Array Indices Out of Bounds**:
+
+	* Deciding whether a program will ever attempt to access an array index outside its declared bounds.
+
+	* For example, trying to access `array[10]` when the array is declared with a size of 5.
+
+* **Division by 0**:
+
+	* Deciding whether a program will ever attempt to divide a number by zero during execution.
+
+* **Dynamic Type Compatibility**:
+
+	* Determining whether runtime type mismatches will occur in programs that perform dynamic type checking (e.g., attempting to treat an integer as a string).
+
+* **General Runtime Errors**:
+
+	* Catching various runtime exceptions like invalid memory access, stack overflows, or uninitialized variable usage.
+
+
+
+* **Semidecidability of Related Sets:**
+
+	* **Halting Problem**:
+
+		* If the Turing Machine $M$ halts on a given input, you will eventually detect it when it halts.
+
+		* If it does not halt, you will never know for sure.
+
+	* **Division by Zero or Similar Runtime Errors**:
+
+		* If there exists any input $x$ such that a program $P$ , executed on $x$ , performs a division by zero, you will eventually find this input by observing the program’s execution.
+
+		* However, if no such input exists, you will never know for certain.
+
+		* **How can we ensure that division by zero is detected, if it exists, across all possible inputs?**
+			* If program $P$ , executed on $x$ , does not halt, how can we determine if $P$ , executed on some other input $y \neq x$ , will execute a division by zero?
+
+
+
+* **Theorem Statement:**
+
+	* The set of values $x$ (indexes of Turing Machines) for which there exists a $z$ such that $f_x(z) \neq \perp$ (the computation does not diverge) is **semidecidable**.
+
+	* In this case:
+
+		* $x$ represents the Turing Machine.
+
+		* $z$ is an input for the function $f_x$ .
+
+	* **Semidecidability** means:
+		* If such a $z$ exists for a given $x$ , you can eventually find it.
+		* If no such $z$ exists, you can never definitively conclude that it does not exist.
+
+* **Sketch of the Proof:**
+
+	* **Basic Idea**:
+
+		* If $f_x(0) \neq \perp $, you can immediately answer “yes” to the question of whether there exists such a $z$ .
+
+		* However, if $f_x(0)$ diverges (does not halt), you need a systematic way to search through inputs $z$ for which $f_x(z) \neq \perp$ 
+
+	* **The Dovetailing Technique**:
+
+		* A systematic method to interleave the computation of multiple inputs $z$ in parallel.
+
+		* Steps:
+
+			1. Simulate **1 step** of $f_x(0)$ .
+			2. Simulate **1 step** of $f_x(1)$ .
+			3. Simulate **2 steps** of $f_x(0)$ .
+			4. Simulate **2 steps** of $f_x(1)$ , followed by **1 step** of $f_x(2)$ .
+			5. Continue this process as shown in the diagram.
+
+			<img src="assets/image-20241124203103643.png" alt="image-20241124203103643" style="zoom:50%; margin-left: 0" />
+
+		* This ensures that if any $f_x(z) \neq \perp$ , it will eventually be discovered, no matter how long it takes for the computation to halt.
+
+
+
+## Conclusion
+
+* **Semidecidable Problems:**
+
+	* A significant number of computational problems are **not decidable** but are **semidecidable**.
+
+	* For semidecidable problems:
+
+		* **Presence**: You can confirm the presence of a solution (e.g., finding an error or detecting halting).
+
+		* **Absence**: You cannot confirm the absence of a solution (e.g., proving the absence of errors or guaranteeing halting).
+
+* **Detecting Presence vs. Absence:**
+
+	* The semidecidable set is the set of programs that **exhibit errors** (e.g., erroneous programs).
+
+	* The set of programs that are **error-free** (absence of errors) is **not semidecidable**, because:
+
+		* The complement of a semidecidable set is not guaranteed to be semidecidable unless the original set is decidable.
+
+		* Hence, proving correctness (absence of errors) is a much harder problem than detecting errors.
+
+* **Correctness and Complement Sets:**
+
+	* **Correctness (error-free programs)**:
+		* Not only is it undecidable, but it is also **not semidecidable**.
+		* This follows from the fact that if both a set and its complement were semidecidable, the set would be decidable (which contradicts undecidability).
+
+* **Practical Implications on Testing:**
+
+	* Famous quote by **Edsger Dijkstra**:
+
+		* “**Testing can prove the presence of errors, not their absence.**
+
+			* A single test case that reveals an error confirms the program is incorrect.
+
+			* However, no amount of testing can guarantee that a program is error-free (since it would require exhaustive verification, which is undecidable).
+
+* **Systematic Technique:**
+
+	* To prove that a problem is **not RE** (recursively enumerable):
+
+		* Demonstrate that its complement is RE.
+
+		* This provides a systematic approach to understanding unsolvable problems in computation.
