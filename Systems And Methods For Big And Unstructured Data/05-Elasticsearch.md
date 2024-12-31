@@ -631,11 +631,11 @@ Elasticsearch supports two different categories of query clauses
 
 * **Boolean Queries** match documents matching boolean combinations of other queries
 
-	* It is built using one or more boolean clauses, each clause with a typed occurrence
+  * It is built using one or more boolean clauses, each clause with a typed occurrence
 
-	* The table below highlights the available boolean clauses
+  * The table below highlights the available boolean clauses
 
-		<img src="assets/image-20241130203553677.png" alt="image-20241130203553677" style="zoom: 25%; margin-left: 0" />
+  	<img src="assets/image-20241130203553677.png" alt="image-20241130203553677" style="zoom: 25%; margin-left: 0" />
 
 * Each of the **clauses** describes may contain multiple conditions
 
