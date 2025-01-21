@@ -19,7 +19,9 @@ MongoDB is a document-oriented database that stores data within **Collections** 
 
 
 
-# Create Documents
+# Syntax
+
+## Create Documents (`InsertOne()`, `InsertMany()`)
 
 * **A document** can be added to a collection using the **`InsertOne(...)`** method
 
@@ -29,7 +31,7 @@ MongoDB is a document-oriented database that stores data within **Collections** 
 
 
 
-# Create Indexes
+## Create Indexes (`createIndex()`)
 
 * **Indexes** are data structures that **store** a small portion of the collection's data set in an easy to traverse form, ordered by the value of the field
 
@@ -41,7 +43,7 @@ MongoDB is a document-oriented database that stores data within **Collections** 
 
 
 
-# Nested Documents & Structures
+## Nested Documents & Structures
 
 * Documents can contain complex structures, like **sub-documents** or even **collections** of documents
 
@@ -55,7 +57,7 @@ MongoDB is a document-oriented database that stores data within **Collections** 
 
 
 
-# Collect Documents & Filtering
+## Collect Documents & Filtering (`findOne()`, `find()`, `countDocuments()`)
 
 * A document can be collected using the **`findOne(...)`** method
 
@@ -73,7 +75,7 @@ MongoDB is a document-oriented database that stores data within **Collections** 
 
 
 
-# Update Documents
+## Update Documents (`updateOne()`, `updateMany()`)
 
 * A document can be updated using the **`updateOne(...)`** method
 
@@ -85,7 +87,7 @@ MongoDB is a document-oriented database that stores data within **Collections** 
 
 
 
-# Delete Documents
+## Delete Documents (`deleteOne()`, `deleteMany()`)
 
 * A document can be deleted using the **`deleteOne(...)`** method
 
@@ -99,7 +101,7 @@ MongoDB is a document-oriented database that stores data within **Collections** 
 
 
 
-# Projections
+## Projections
 
 * When collecting documents, it is possible to restrict, explicit, or expand the fields to be returned through **projections**
 
@@ -114,7 +116,7 @@ MongoDB is a document-oriented database that stores data within **Collections** 
 
 
 
-# Sort & Limit
+## `Sort()` & `Limit()`
 
 * When collecting documents, it is possible to sort and limit the results, these operations can be performed through the **`$sort`** and **`$limit`** stages or using the **`sort()`** and **`limit()`** methods
 
@@ -214,11 +216,11 @@ Operators that return documents based on evaluations of individual fields or doc
 	* The query look for documents in the `people_collection` where at least one of the entries in the `mobile_phone_numbers` array has a `service_provider` equal to "Wind"
 	* If such an entry exists, the entire document is returned, regardless of how many entries exist in the `mobile_phone_numbers` array
 
-* Whenever **multiple** conditions are evaluated on the documents in an **array** field, they will be accessed individually on the array's documents, hence returning the main document if, for each condition, there exists ==**at least one**== document that satisfies it. <u>It doesn't matter whether there's ==**only one**== document satisfying all conditions or ==**multiple**== documents satisfying one each</u>
+* Whenever **multiple** conditions are evaluated on the documents in an **array** field, they will be accessed individually on the array's documents, hence returning the main document if, for each condition, there exists ==**at least one**== document that satisfies it. <font color=red>It doesn't matter whether there's ==**only one**== document satisfying all conditions or ==**multiple**== documents satisfying one each</font>
 
 	<img src="assets/image-20241120163951032.png" alt="image-20241120163951032" style="zoom:40%; margin-left: 0" />
 
-* Whenever a query is targeted at evaluating **multiple** conditions on the fields of the ==**same**== document of an array, it is necessary to apply the **`$elemMatch`** stage. In particular, <u>it matches documents containing an array field with ==**at least one**== document that satisfies **all** the specified query criteria</u>
+* Whenever a query is targeted at evaluating **multiple** conditions on the fields of the ==**same**== document of an array, it is necessary to apply the **`$elemMatch`** stage. In particular, <font color=red>it matches documents containing an array field with ==**at least one**== document that satisfies ==**all**== the specified query criteria</font>
 
 	<img src="assets/image-20241120164712365.png" alt="image-20241120164712365" style="zoom:40%; margin-left: 0" />
 
@@ -232,7 +234,7 @@ Operators that return documents based on evaluations of individual fields or doc
 
 	* It shapes the collection so that **each** document is replaced with a set of new ones, i.e., ==**one for each element in the document's array**== on which the unwind stage is applied. These new documents contain all the fields from the main one and a field with the name of the array field that contains one of its documents
 
-	* When applying **`$unwind`** or **`$group`** stages, it is <u>necessary to apply the **`aggregate(...)`** method</u>, i.e., a method to compute aggregate values for the documents in a collection
+	* <font color=red>When applying **`$unwind`** or **`$group`** stages, it is necessary to apply the **`aggregate(...)`** method,</font> i.e., a method to compute aggregate values for the documents in a collection
 
 		<img src="assets/image-20241120170550413.png" alt="image-20241120170550413" style="zoom:40%; margin-left: 0" />
 
@@ -243,9 +245,9 @@ Operators that return documents based on evaluations of individual fields or doc
 
 # Aggregation
 
-* Aggregate operations, i.e., operations aimed at grouping with respect to one or more fields, are achieved by applying the <u>**`$group`** stage within the **`aggregate(...)`** method</u>. Such a stage requires defining the list of fields to perform the aggregation and the aggregation functions to be applied
+* Aggregate operations, i.e., operations aimed at grouping with respect to one or more fields, are achieved by applying the <font color=red>**`$group`** stage within the **`aggregate(...)`** method</font>. Such a stage requires defining the list of fields to perform the aggregation and the aggregation functions to be applied
 
-* Whenever a <u>`$group` stage is applied, only the fields used to perform the aggregation or created by it will be available in the next stages</u>
+* Whenever a <font color=red>**`$group`** stage is applied, only the fields used to perform the aggregation or created by it will be available in the next stages</font>
 
 	* MongoDB supports many aggregate functions, e.g., **`$sum`, `$avg`, `$min`, `$max`**, etc
 
@@ -272,13 +274,13 @@ Operators that return documents based on evaluations of individual fields or doc
 
 * Whenever an aggregation pipeline is to be employed, it is necessary to explicitly specify all the different pipeline stages (e.g., filtering, projections, etc)
 
-	* In particular, besides the previously explained **`$group`, `$unwind`, `$sort`**, and **`$limit`** stages, **`$match`** defines filters while `$project` defines projections, these stages can be applied interchangeably in the aggregation pipeline
+	* In particular, besides the previously explained **`$group`, `$unwind`, `$sort`**, and **`$limit`** stages, **`$match`** defines filters while **`$project`** defines projections, these stages can be applied interchangeably in the aggregation pipeline
 
 		<img src="assets/image-20241120174133058.png" alt="image-20241120174133058" style="zoom:40%; margin-left: 0" />
 
 
 
-# Exercises
+# MCQ Exercises
 
 ![image-20241120224311561](assets/image-20241120224311561.png)
 
@@ -333,6 +335,212 @@ Operators that return documents based on evaluations of individual fields or doc
 
 
 ![image-20241120225908238](assets/image-20241120225908238.png)
+
+
+
+# Coding Exercises
+
+Write a query to return all the housings whose minimum nights is equal to 2
+
+```sql
+db.air_bnb_collection.find({"minimum_nights": {"$eq": "2"}}, -- filter
+                           {"minimum_nights": 1}) -- projection
+```
+
+* I return `minimum_nights` just to check that the answer is correct, I'll do the same in other queries to properly visualize the result
+
+
+
+Write a query to return the number of housings whose number of reviews is greater than 10
+
+```sql
+db.air_bnb_collection.find({"number_of_reviews": {"$gt": "10"}},
+                           {"number_of_reviews": 1})
+                     .sort({"number_of_reviews": 1})
+```
+
+
+
+Write a query to return the top 10 housings based on their number of bedrooms
+
+```sql
+db.air_bnb_collection.find({},
+                           {"bedrooms": 1})
+                     .sort({"bedrooms": -1})
+                     .limit(10)
+```
+
+
+
+Write a query to return the housings whose host response rate is greater than 90
+
+```sql
+db.air_bnb_collection.find({"host.host_response_rate": {"$gt": 90}},
+                           {"host.host_response_rate": 1})
+```
+
+
+
+Write a query to return the name of the hosts whose housings includes a TV and Iron
+
+```sql
+db.air_bnb_collection.find(
+    {
+		"$and": [
+            {"amenities": "TV"},
+            {"amenities": "Iron"}
+        ]    
+    },
+    {"name": 1, "amenities": 1}
+)
+```
+
+
+
+Write a query to return the name of the hosts whose housings includes a TV or Iron
+
+```sql
+db.air_bnb_collection.find(
+    {
+		"$or": [
+            {"amenities": "TV"},
+            {"amenities": "Iron"}
+        ]    
+    },
+    {"name": 1, "amenities": 1}
+)
+```
+
+
+
+Write a query to count the number of housings based on their price
+
+```sql
+db.air_bnb_collection.aggregate([
+    "$group": {
+    	"_id": "$price", 
+    	"housing_count": {"$sum": 1}
+    }
+])
+```
+
+
+
+Write a query to compute the total number of bedrooms available across all housings
+
+```sql
+db.air_bnb_collection.aggregate([
+    "$group": {
+    	"_id": true,
+    	"bedroom_count": {"$sum": "$bedroom"} -- remember the $ ahead bedroom
+    }
+])
+```
+
+
+
+Write a query to compute the total number of housings based on their cancellation policy, whose accommodates is greater than 6 and whose host has a profile picture
+
+```sql
+db.air_bnb_collection.aggregate([
+    {"$match": {"accommodates": {"$gt": 6}}},
+    {"$match": {"host.host_has_profile_pic": true}},
+    {"$group": {
+    	"_id": "$cancellation_policy",
+    	"cancellation_policy_count": {"$sum": 1}
+    }}
+])
+```
+
+
+
+Write a query to compute the total number of housings for each amenity
+
+```sql
+db.air_bnb_collection.aggregate([
+    {"$unwind": {"path": "$amenities"}},
+    {"$group": {
+    	"_id": "$amenities",
+		"housing_with_amenity_count": {"$sum": 1}
+    }}
+])
+```
+
+
+
+Write a query to compute the total number of housings for each amenity, returning only the amenities whose count is greater than 15
+
+```sql
+db.air_bnb_collection.aggregate([
+    {"$unwind": {"path": "$amenities"}},
+    {"$group": {
+    	"_id": "$amenities",
+		"housing_with_amenity_count": {"$sum": 1}
+    }},
+    {"$match": {"housing_with_amenity_count": {"$gt": 15}}}
+])
+```
+
+
+
+Write a query to compute the average price and the average cleaning fees of the housings based on their number of bedrooms and bathrooms, returning only those whose average price is greater than 60 and average cleaning fees is greater than 40
+
+```sql
+db.air_bnb_collection.aggregate([
+    {"$group": {
+    	"_id": {"n_bed": "$bedrooms", "n_bath": "$bathrooms"},
+    	"avg_price": {"$avg": "$price"},
+    	"avg_cleaning_fees": {"$avg": "$cleaning_fee"}
+    }},
+    {"$match": {"avg_price": {"$gt": 60}}},
+    {"$match": {"avg_cleaning_fees": {"$gt": 40}}}
+])
+```
+
+
+
+Write a query to return the housings for which **at least one review** with listing id 10006546 **and** reviewer id 11263097 was written
+
+```sql
+db.air_bnb_collection.aggregate([
+    {"$match": {"reviews": {
+    	-- it matches documents containing an array field with **at least one** document that satisfies **all** the specified query criteria
+    	"$elemMatch": {
+    		"listing_id": "10006546",
+    		"reviewer_id": "11263097"
+    	}
+    }}}
+])
+```
+
+
+
+Write a query to return the housings for which **at least one review** with listing id 10006546 and **one** with reviewer name Bridget were written
+
+```sql
+db.air_bnb_collection.aggregate([
+    -- it doesn't matter whether there's **only one** document satisfying all conditions or **multiple** documents satisfying one each
+    {"$match": {"reviews.listing_id": "10006546"}},
+    {"$match": {"reviews.reviewer_name": "Bridget"}}
+])
+```
+
+
+
+For each country, compute the total number of **unique** hosts
+
+```sql
+db.air_bnb_collection.aggregate([
+    {"$group": {
+    	"_id": {"country": "$address.country", "host_id": "$host.host_id"},
+    	"duplication_count_per_host": {"$sum": 1}
+    }},
+    {"$group": {
+    	"_id": "$_id.country",
+    	"unique_host_count": {"$sum": 1}
+    }}
+])
+```
 
 
 

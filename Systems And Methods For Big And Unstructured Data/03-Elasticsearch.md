@@ -431,70 +431,72 @@ Elasticsearch supports two different categories of query clauses
 
 * **Match Queries** return documents that match a provided text, number, date or boolean value
 
-	* Whenever a text field is provided, it is analyzed before matching
+  * Matches are based on terms after analysis, rather than the raw text
 
-		```http
-		GET /steam_overviews/_search
-		{
-		  "query": {
-		    "match": {
-		      "publisher": {
-		        "query": "Daybreak Game Company"
-		      }
-		    }
-		  }
-		}
-		```
+  * Whenever a text field is provided, it is analyzed before matching
 
-		* Searches the `"publisher"` field for documents containing the term “Daybreak Game Company”
+    ```http
+    GET /steam_overviews/_search
+    {
+      "query": {
+        "match": {
+          "publisher": {
+            "query": "Daybreak Game Company"
+          }
+        }
+      }
+    }
+    ```
 
-	* It can be performed using a compact style
+    * Searches the `"publisher"` field for documents containing the term “Daybreak Game Company”
 
-		```http
-		GET /steam_overviews/_search
-		{
-		  "query": {
-		    "match": {
-		      "publisher": "Daybreak Game Company"
-		    }
-		  }
-		}
-		```
+  * It can be performed using a compact style
 
-		* `"query"` : The root key under which all search-related conditions are specified
-		* `"match"` : Specifies the type of query
-		* `"publisher"` : The field in the documents being searched
-		* `"Daybreak Game Company"` : The value you want to search for in the `"publisher"` field
+    ```http
+    GET /steam_overviews/_search
+    {
+      "query": {
+        "match": {
+          "publisher": "Daybreak Game Company"
+        }
+      }
+    }
+    ```
+
+    * `"query"` : The root key under which all search-related conditions are specified
+    * `"match"` : Specifies the type of query
+    * `"publisher"` : The field in the documents being searched
+    * `"Daybreak Game Company"` : The value you want to search for in the `"publisher"` field
 
 * **Match Queries** are of type boolean, meaning that the provided text is analyzed, and a boolean query is constructed based on the analysis results.
 
 * Depending on the value of the **operator** parameter, the boolean query is either built using the **`OR`** operator or the **`AND`** operator
 
-	* **`OR`** : Matches the documents that contain at least 1 word among the ones returned by the analyzer
+  * **`OR`** : Matches the documents that contain at least 1 word among the ones returned by the analyzer
 
-	* **`AND`** : Matches the documents that contain all the words returned by the analyzer
+  * **`AND`** : Matches the documents that contain all the words returned by the analyzer
 
-		```http
-		GET /steam_overviews/_search
-		{
-		  "query": {
-		    "match": {
-		      "overview": {
-		        "query": "free-to-play",
-		        "operator": "or"
-		      }
-		    }
-		  }
-		}
-		```
+  	```http
+  	GET /steam_overviews/_search
+  	{
+  	  "query": {
+  	    "match": {
+  	      "overview": {
+  	        "query": "free-to-play",
+  	        "operator": "or"
+  	      }
+  	    }
+  	  }
+  	}
+  	```
 
-		* The query is targeting the `"overview"` field with the value "free-to-play".
-		* `OR` : Matches documents that contain **at least one** of the terms: free, to, or play.
+  	* The query is targeting the `"overview"` field with the value "free-to-play".
+  	* `OR` : Matches documents that contain **at least one** of the terms: free, to, or play.
 
-		<img src="assets/image-20241130162851221.png" alt="image-20241130162851221" style="zoom:15%; margin-left: 0" />
+  	<img src="assets/image-20241130162851221.png" alt="image-20241130162851221" style="zoom:15%; margin-left: 0" />
 
-		* The `“total”` field under `“hits”` indicates the number of matching documents.
-		* The relevance scoring remains consistent for the top document, but the number of returned documents differs depending on the query logic.
+  	* The `“total”` field under `“hits”` indicates the number of matching documents.
+  	* The relevance scoring remains consistent for the top document, but the number of returned documents differs depending on the query logic.
 
 
 
@@ -502,39 +504,43 @@ Elasticsearch supports two different categories of query clauses
 
 * **Term Queries** return documents that contain an ==**exact term**== in a provided field
 
+	* No analysis is performed on the query input or the field values
+
+	* Directly matches the raw value of the field.
+
 * ==**DO NOT**== use term queries for **text fields**
 
-	* Remember that text fields are analyzed, such an approach make it difficult to find exact matches
+  * Remember that text fields are analyzed, such an approach make it difficult to find exact matches
 
-		```http
-		GET /steam_overviews/_search
-		{
-		  "query": {
-		    "term": {
-		      "publisher": {
-		        "value": "Ubisoft "
-		      }
-		    }
-		  }
-		}
-		```
+  	```http
+  	GET /steam_overviews/_search
+  	{
+  	  "query": {
+  	    "term": {
+  	      "publisher": {
+  	        "value": "Ubisoft "
+  	      }
+  	    }
+  	  }
+  	}
+  	```
 
-		* `"value"` : contains the term to look for in the document
+  	* `"value"` : contains the term to look for in the document
 
 * **Term Queries** support the following parameters
 
-	* `boost` : 
-		* **Type**: Float number.
-		* **Purpose**: Adjusts the relevance score of the query. A higher value increases the priority of the query in the search results, and a lower value decreases it.
-		* **Default Value**: 1.0.
-		* **Use Case**: When running multiple queries, you can boost certain terms to make them more significant in the result ranking.
-	* `case_insensitive` : 
-		* **Type**: Boolean (true or false).
-		* **Purpose**: Enables or disables case-insensitive matching.
-		* **Default Value**: true.
-		* **Use Case**: Allows matching regardless of case (e.g., “Ubisoft” matches “ubisoft” if case_insensitive is true).
+  * `boost` : 
+  	* **Type**: Float number.
+  	* **Purpose**: Adjusts the relevance score of the query. A higher value increases the priority of the query in the search results, and a lower value decreases it.
+  	* **Default Value**: 1.0.
+  	* **Use Case**: When running multiple queries, you can boost certain terms to make them more significant in the result ranking.
+  * `case_insensitive` : 
+  	* **Type**: Boolean (true or false).
+  	* **Purpose**: Enables or disables case-insensitive matching.
+  	* **Default Value**: true.
+  	* **Use Case**: Allows matching regardless of case (e.g., “Ubisoft” matches “ubisoft” if case_insensitive is true).
 
-	These parameters must be added within the field, together with the `"value"` parameter
+  These parameters must be added within the field, together with the `"value"` parameter
 
 
 
@@ -600,27 +606,26 @@ Elasticsearch supports two different categories of query clauses
 	* **Optional Rounding Operator**:
 		* Rounds the date to the closest specified unit.
 		* Examples:
-			* `/d` rounds to the start of the day.
-			* `/M` rounds to the start of the month.
+			* `/d` rounds to the **start** of the day.
+			* `/M` rounds to the **start** of the month.
 
 * **Examples**:
 
 	* `now +1d /M` :
-
-		* Starts from the current time (now).
+	* Starts from the current time (now).
 		* Adds 1 day.
-		* Rounds to the start of the next month.
+		* Rounds the resulting date to the start of the month
+		* e.g., 2025-01-17T14:30:00 $\overset{+1d}{\rightarrow}$ 2025-01-18T14:30:00 $\overset{/M}{\rightarrow}$ 2025-01-01T00:00:00
 
 	* `now -1Y /Y` :
-
 		* Starts from the current time (now).
-
+		
 		* Subtracts 1 year.
-
+		
 		* Rounds to the start of the year.
-
+		
 	* `2022.07.28||+2M /M` :
-
+	
 		* Uses `2022.07.28` as the anchor date.
 		* Adds 2 months.
 		* Rounds to the start of the resulting month.
@@ -760,30 +765,30 @@ Elasticsearch supports two different categories of query clauses
 
 * Aggregations can be combined with normal queries to filter the data and then perform the aggregation
 
-	```http
-	GET /steam_overviews/_search
-	{
-	  "size": 0,
-	  "query": {
-	    "term": {
-	      "publisher": {
-	        "value": "Ubisoft "
-	      }
-	    }
-	  },
-	  "aggs": {
-	    "games_per_publisher": {
-	      "terms": {
-	        "field": "publisher"
-	      }
-	    }
-	  }
-	}
-	```
+  ```http
+  GET /steam_overviews/_search
+  {
+    "size": 0,
+    "query": {
+      "term": {
+        "publisher": {
+          "value": "Ubisoft "
+        }
+      }
+    },
+    "aggs": {
+      "games_per_publisher": {
+        "terms": {
+          "field": "publisher"
+        }
+      }
+    }
+  }
+  ```
 
-	* The query is executed first: Elasticsearch filters the dataset to include only documents where the publisher field equals "Ubisoft ".
-	* The aggregation is applied to the filtered data: Within the filtered documents, the aggregation groups by the publisher field and counts the number of documents in each group.
-	* The response will include: Aggregated results, such as the total number of games published by each unique publisher (based on the publisher field).
+  * The query is executed first: Elasticsearch filters the dataset to include only documents where the publisher field equals "Ubisoft ".
+  * The aggregation is applied to the filtered data: Within the filtered documents, the aggregation groups by the publisher field and counts the number of documents in each group.
+  * The response will include: Aggregated results, such as the total number of games published by each unique publisher (based on the publisher field). In this example, the buckets in the games_per_publisher aggregation will only contain the "Ubisoft" key, assuming the term query successfully filters documents where publisher is exactly "Ubisoft"
 
 * Within the same ages operator, it is possible to perform **multiple** aggregations on different fields
 
@@ -830,7 +835,7 @@ Elasticsearch supports two different categories of query clauses
 		```
 
 		* A `"hits"` section (showing the total document count but no document details because size: 0).
-		* An aggregations section containing results for both `"games_per_publisher"` and `"games_per_developer"` as separate sub-objects.
+		* An aggregations section containing results for **both** `"games_per_publisher"` and `"games_per_developer"` as separate sub-objects.
 
 * Elasticsearch supports **Sub-Aggregations** which are computed for each aggregation by considering the documents in each one of them
 
@@ -866,7 +871,7 @@ Elasticsearch supports two different categories of query clauses
 
 		```json
 		{
-			"key": "Daybreak Game Company ",
+		  "key": "Daybreak Game Company ",
 		  "doc_count": 3,
 		  "average_games_per_publisher": {
 		    "value": null
@@ -881,7 +886,376 @@ Elasticsearch supports two different categories of query clauses
 
 	
 
+# Exercises
+
+Define the ==**full mapping**== describing a Person with 10 shards and 3 replicas
+
+```http
+PUT /people
+{
+	"settings": {
+		"number_of_shards": 10,
+		"number_of_replicas": 3
+	},
+	"mappings": {
+		"properties": {
+			"personal_id": {
+				"type": "keyword"
+			},
+			"name": {
+				"type": "text"
+			},
+			"surname": {
+				"type": "text"
+			},
+			"birth_date": {
+				"type": "date",
+				"format": "yyyy-MM-dd"
+			},
+			"address": {
+				"type": "text"
+			},
+			"eye_color": {
+				"type": "keyword"
+			},
+			"height": {
+				"type": "integer"
+			}
+		}
+	}
+}
+```
 
 
 
+Extract all the games which publisher **is** "Ubisoft"
+
+```http
+GET /stream_overviews/_search
+{
+	"query": {
+		"term": {
+			"publisher": "Ubisoft"
+		}
+	}
+}
+```
+
+
+
+Extract all games which tags field **contains** the "Free-to-Play" tag
+
+```http
+GET /stream_overviews/_search
+{
+	"query": {
+		"match": {
+			"tags": "Free-to-Play"
+		}
+	}
+}
+```
+
+
+
+Extract all games which tags field contains the "Free-to-Play" tag, prioritizing those whose developer is "Daybreak Game Company"
+
+```http
+GET /stream_overviews/_search
+{
+	"query": {
+		"bool": {
+			"must": [
+				{"match": {"tags": "Free-to-Play"}}
+			],
+			"should": [
+				{"term": {"developer": {"value": "Daybreak Game Company"}}}
+			]
+		}
+	}
+}
+```
+
+
+
+Extract all games which publisher is exactly "Lag Studios" **without** computing the relevance score
+
+```http
+GET /stream_overviews/_search
+{
+	"query": {
+		"bool": {
+			"filter": [
+				{"term": {"publisher": "Lag Studios"}}
+			]
+		}
+	}
+}
+```
+
+
+
+For each developer, extract the count of the games which tags field contains the "Free-to-Play" tag
+
+```http
+GET /stream_overviews/_search
+{
+	"size": 0
+	"query": {
+		"bool": {
+			"must": [
+				{"match": {"tags": "Free-to-Play"}}
+			]
+		}
+	},
+	"aggs": {
+		"f2p_per_devs": {
+			"terms": {
+				"field": "developer"
+			}
+		}
+	}
+}
+```
+
+
+
+----
+
+The dataset is a collection of employees with the following attributes and types.
+
+- **Address** - Text
+- **Age** - Integer
+- **DateOfJoining** - Date
+- **Designation** - Text
+- **FirstName** - Text
+- **Gender** - Text
+- **Interests** - Text
+- **LastName** - Text
+- **MaritalStatus** - Text
+- **Salary** - Integer
+
+
+
+Write a query to collect all the employees whose first name is "Bob"
+
+```http
+GET /employees50k/_search/
+{
+	"query": {
+		"term": {
+			"FirstName": "Bob"
+		}
+	}
+}
+```
+
+
+
+Write a query to collect all the employees whose salary is greater than 80000 and less than 95000
+
+```http
+GET /employees50k/_search/
+{
+	"query": {
+		"range": {
+			"Salary": {
+				"gt": 80000,
+				"lt": 95000
+			}
+		}
+	}
+}
+```
+
+
+
+Write a query to collect all the employees whose age is 31
+
+```http
+GET /employees50k/_search/
+{
+	"query": {
+		"term": {
+			"Age": 31
+		}
+	}
+}
+```
+
+* **Disclaimer**: This solution is not optimal (although it works). The best one would be a range query with gte and lte 31
+
+
+
+Write a query to collect all the employees who joined later than 03/09/2015
+
+```http
+GET /employees50k/_search/
+{
+	"query": {
+		"range": {
+			"DateOfJoining": {"gt": "03/09/2015"}
+		}
+	}
+}
+```
+
+
+
+Write a query to collect all the employees whose gender is exactly "Male"
+
+```http
+GET /employees50k/_search/
+{
+	"query": {
+		"term": {
+			"Gender": "Male"
+		}
+	}
+}
+```
+
+
+
+Write a query to collect all the employees whose first name is "Moses" and whose last name is "Daschofsky"
+
+```http
+GET /employees50k/_search/
+{
+	"query": {
+		"bool": {
+			"must": [
+				{"match": {"FirstName": "Moses"}},
+				{"match": {"LastName": "Daschofsky"}}
+			]
+		}
+	}
+}
+```
+
+
+
+Write a query to collect all the employees whose interests contains ==**one or more words**== among "Paragliding", "Kayaking", and "Playing". The more words are found, the higher the final score
+
+```http
+GET /employees50k/_search/
+{
+	"query": {
+		"match": {
+			"Interest": "Paragliding, Kayaking, Playing",
+			"Operator": "OR"
+		}
+	}
+}
+```
+
+
+
+Write a query to collect all the employees whose name is "Elden", assigning a higher score those whose designation is "Delivery Manager"
+
+```http
+GET /employees50k/_search/
+{
+	"query": {
+		"bool": {
+			"must": [{"match": {"FirstName": "Elden"}}],
+            "should": [{"match": {"Designation": "Delivery Manager"}}]
+		}
+	}
+}
+```
+
+
+
+Write a query to collect all the employees whose last name is "Weatherly" and whose salary is greater than 50000. The name should not affect the final score
+
+```http
+GET /employees50k/_search/
+{
+	"query": {
+		"bool": {
+			"must": [{"range": {"Salary": {"gt": 50000}}}]
+			"filter": [{"match": {"LastName": "Weatherly"}}]
+		}
+	}
+}
+```
+
+
+
+Write a query to collect all the employees whose designation is "Manager", assigning a higher score to those whose gender is "Female" and those who are "Married"
+
+```http
+GET /employees50k/_search/
+{
+	"query": {
+		"bool": {
+			"must": [{"match": {"Designation": "Manager"}}]
+			"should": [
+				{"term": {"Gender": "Male"}}, 
+				{"term": {"MaritalStatus": "Married"}}
+            ]
+		}
+	}
+}
+```
+
+
+
+Write a query to collect all the employees whose designation is "Manager" or "Delivery Manager" and whose salary is not higher than 150000. Assign a higher score to those whose interests includes "Blogging"
+
+```http
+GET /employees50k/_search/
+{
+	"query": {
+		"bool": {
+			"must": [
+				{"match": {"Designation": "Delivery Manager", "operator": "OR"}},
+				{"range": {"Salary": {"lte": 150000}}}
+			]
+			"should": [{"match": {"Interest": "Blogging"}}]
+		}
+	}	
+}
+```
+
+
+
+Write a query to count the number of employees based on their gender and designation ==**separately**==
+
+```http
+GET /employees50k/_search/
+{
+	"query": {
+		"size": 0,
+		"aggs": {
+			"employees_per_gender": {"terms": {"field": "Gender"}},
+			"employees_per_designation": {"terms": {"field": "Designation"}}
+		}
+	}
+}
+```
+
+
+
+Write a query to count the number of employees based on their gender. Then, compute the number of people based on their age for each gender
+
+```http
+GET /employees50k/_search/
+{
+	"query": {
+		"size": 0,
+		"aggs": {
+			"employees_per_gender": {
+				"term": {"field": "Gender"}
+				"aggs": {
+					"employees_per_gender_per_age": {
+						"term": {"field": "Age"}
+					}
+				}
+			}
+		}
+	}
+}
+```
 

@@ -1,4 +1,4 @@
-# Some Concepts
+# Syntax
 
 ## Introduction to Cypher
 
@@ -73,9 +73,7 @@
 
 * `DETACH` removes all the relationships before removing the nodes
 
-	* `DETACH` is important when you need to remove nodes that have relationships
-
-	* Without it, the `DELETE` operation would fail if any of the matched nodes still had relationships!!
+	* **`DETACH` is important when you need to remove nodes that have relationships.** Without it, the `DELETE` operation would fail if any of the matched nodes still had relationships!!**
 
 		<img src="assets/image-20241105125208813.png" alt="image-20241105125208813" style="zoom:17%; margin-left: 0" />
 
@@ -84,7 +82,7 @@
 		<img src="assets/image-20241105125522219.png" alt="image-20241105125522219" style="zoom:17%; margin-left: 0" />
 
 		* Unlike the previous example, this query does **not** use `DETACH`, meaning that it will only delete the node if it has no relationships
-		* If the node has any relationships, the query will fail because Neo4j prevents the deletion of nodes with existing relationships unless they are explicitly detached using the `DETACH DELETE` clause
+	* If the node has any relationships, the query will fail because Neo4j prevents the deletion of nodes with existing relationships unless they are explicitly detached using the `DETACH DELETE` clause
 
 
 
@@ -241,7 +239,19 @@
 
 
 
-# Graph Exercise
+# ER Model to Neo4j Implementation
+
+Transforming an ER model into a Neo4j implementation is quite simple.
+
+* **Entities** are transformed into Neo4j **nodes**, maintaining their attributes and using the name of the entity as label.
+* **Relationships** are transformed into their equivalent in Neo4j, maintaining their attributes and using the name of the relationship as label.
+* In **ISA Hierarchies**, **parent** entities become nodes, maintaining their attributes, name as label, and relationships (in ==**partial**== relationships), while **children** entities become nodes, maintaining their attributes and relationships and inheriting the ones from the parent entity as well as their label.
+* ==**N.B.** In ISA Hierarchies, **child** entities will have more labels! (e.g., overlapping ISA)==
+* ==**N.B.** N:N relationship do not need any special treatment.==
+
+
+
+# MCQ Exercises
 
 ![image-20241106210302718](assets/image-20241106210302718.png)
 
@@ -271,7 +281,7 @@
 
 
 
-# Coding Exercise
+# Coding Exercises
 
 ## Data Model
 
@@ -279,7 +289,7 @@
 
 
 
-## Return all the different types of nodes (one at time) to inspect their attributes, limiting the number of returned nodes to 10
+Return all the different types of nodes (one at time) to inspect their attributes, limiting the number of returned nodes to 10
 
 ```sql
 MATCH (u:User) RETURN u LIMIT 10
@@ -295,7 +305,7 @@ MATCH (c:Country) RETURN c LIMIT 10
 
 
 
-## Return all the different relationships (one at a time) to inspect their attributes, limiting the number of returned nodes to 10
+Return all the different relationships (one at a time) to inspect their attributes, limiting the number of returned nodes to 10
 
 ```sql
 MATCH (u:User) - [r:WROTE] -> (re:Review) RETURN u, r, re LIMIT 10
@@ -310,7 +320,7 @@ MATCH (s:State) - [r:IN_COUNTRY] -> (c:Country) RETURN s, r, c LIMIT 10
 
 
 
-## Return the list of listings with accomodates less or equal than 3
+Return the list of listings with accomodates less or equal than 3
 
 ```sql
 MATCH (l:Listing)
@@ -320,7 +330,7 @@ RETURN l, l.accommodates
 
 
 
-## For each user who wrote a review, count the number of reviews they wrote
+For each user who wrote a review, count the number of reviews they wrote
 
 ```sql
 MATCH (u:User) - [r:WROTE] -> (re:Review)
@@ -329,7 +339,7 @@ RETURN u, COUNT(re)
 
 
 
-## Return the list of listings whose amenities include "First Aid Kit" and "Wireless Internet"
+Return the list of listings whose amenities include "First Aid Kit" and "Wireless Internet"
 
 ```sql
 MATCH (l:Listing) - [r1:HAS] -> (a1:Amenity), (l) - [r2:HAS] -> (a2:Amenity)
@@ -339,7 +349,7 @@ RETURN l, a1, a2
 
 
 
-## Return the collection of all the listings' names in the same neighborhood
+Return the collection of all the listings' names in the same neighborhood
 
 ```sql
 MATCH (l:Listing) - [r:IN_NEIGHBORHOOD] -> (n:Neighborhood)
@@ -348,7 +358,7 @@ RETURN n.name, collect(l.name)
 
 
 
-## Return the name of the states with at least 10 neighborhoods
+Return the name of the states with at least 10 neighborhoods
 
 ```sql
 MATCH (s:State) <- [] - (c:City) <- [] - (n:Neighborhood)
@@ -359,7 +369,7 @@ RETURN s.code, neighborhood_count
 
 
 
-## For each host, return the total number of reviews assigned to their listings with "First Aid Kit" amenity, the total number of listings they own, and their name
+For each host, return the total number of reviews assigned to their listings with "First Aid Kit" amenity, the total number of listings they own, and their name
 
 ```sql
 MATCH (h:Host) - [:HOSTS] -> (l:Listing) <- [:REVIEWS] - (r:Review), (l) - [:HAS] -> (a:Amenity)
