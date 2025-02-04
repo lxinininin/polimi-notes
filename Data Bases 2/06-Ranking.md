@@ -1019,7 +1019,7 @@ Let $S = MIN$ and $k = 1$
 		* For these 2 hotels, perform **random access** to get their scores in both cheapness and rating lists.
 		* Compute their overall scores using $S(o)$ .
 
-		<img src="assets/image-20241205203907304.png" alt="image-20241205203907304" style="zoom:33%; margin-left: 0" />
+		<img src="assets/image-20250114124002652.png" alt="image-20250114124002652" style="zoom:30%; margin-left: 0" />
 
 
 
@@ -1064,8 +1064,6 @@ Let $S = MIN$ and $k = 1$
 
 ## Threshold Algorithm (TA)
 
-
-
 * **Input**:
 
 	* $k$ : The number of top objects you want to retrieve.
@@ -1089,7 +1087,8 @@ Let $S = MIN$ and $k = 1$
 		* If the $k$ -th best object’s score is higher than the current threshold $T$ , terminate the algorithm and return the top $k$ results.
 
 * **Output**:
-* The top $k$ objects with the best scores.
+	* The top $k$ objects with the best scores.
+
 
 
 

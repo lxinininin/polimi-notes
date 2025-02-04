@@ -26,15 +26,14 @@
 
 * **Units of Storage**:
 
-	* **Page**: In main memory, data is organized into “pages.” Pages are the basic units that the system transfers from secondary memory into main memory for processing.
+	* **Page**: In ==**main memory**==, data is organized into “==**pages**==”. Pages are the basic units that the system transfers from secondary memory into main memory for processing.
 
-	* **Block**: In secondary memory, data is organized into “blocks,” which are the units of storage that the database system reads and writes.
+	* **Block**: In ==**secondary memory**==, data is organized into “==**blocks**==”, which are the units of storage that the database system reads and writes.
 
 * **Buffer**:
-
-	* The buffer is an area in main memory designated for temporarily holding data pages transferred from secondary memory.
-
-	* This buffer allows for quick access to recently used data, reducing the need to repeatedly access slower secondary memory.
+* The buffer is an area in main memory designated for temporarily holding data pages transferred from secondary memory.
+	
+* This buffer allows for quick access to recently used data, reducing the need to repeatedly access slower secondary memory.
 
 
 
@@ -234,17 +233,15 @@
 <img src="assets/image-20241114211326078.png" alt="image-20241114211326078" style="zoom: 50%; margin-left: 0" />
 
 * **==Block Header== and ==Trailer==**:
-
 	* The block has a **header** and a **trailer** with control information used by the ==**file system**==.
-
+	
 	* These headers and trailers help manage block-level metadata, including aspects like data location and file system integrity.
-
+	
 * **==Page Header== and ==Trailer==**:
-
 	* Inside the block, there is a **page header** and a **page trailer** containing control information specific to the ==**access method**== (such as sequential or hash-based access).
-
+	
 	* This information provides details necessary for the DBMS to understand how to interact with the data based on the chosen storage method.
-
+	
 * ==**Page Dictionary**==:
 
 	* The page dictionary holds pointers (offsets) to each tuple (or elementary data item) in the useful data section of the page.
@@ -541,12 +538,14 @@ The **entry-sequenced structure** is a common solution for general-purpose stora
 
 * **Overflow Chain Length**:
 
-	* The length of an overflow chain (the list of additional blocks linked to a bucket when it overflows) is influenced by two factors:
+  * The length of an overflow chain (the list of additional blocks linked to a bucket when it overflows) is influenced by two factors:
 
-	* **Load Factor**: Represents the **occupancy rate** of the buckets, calculated as: $\text{Load Factor} = \frac{T}{B \times N_B}$
-		* where $T$ is the number of tuples, $B$ is the block factor (number of tuples per block), and $N_B$ is the number of buckets.
-
-	* **Block Factor (B)**: Indicates the number of tuples that can fit within a single block.
+  * **Load Factor**: Represents the **occupancy rate** of the buckets, calculated as: $\text{Load Factor} = \frac{T}{B \times N_B}$
+  	* $T$ : the number of tuples
+  	* $B$ : the block factor (number of tuples per block)
+  	* $N_B$ : the number of buckets.
+  	
+  * **Block Factor (B)**: Indicates the number of tuples that can fit within a single block.
 
 * **Impact of Load Factor and Block Factor**:
 
@@ -738,7 +737,7 @@ The **entry-sequenced structure** is a common solution for general-purpose stora
 | Secondary     | Entry-sequenced or Sequential-ordered with **SK != OK** | Unique and non unique | Dense (not possible to scan primary data structure w.r.t. SK) | Many per table |
 | Clustering    | Sequential-ordered with **SK = OK**                     | Non unique            | Typically sparse                                             | One per table  |
 
-**Warning**: **Terminology may vary** across different database systems. Terms like “primary,” “secondary,” and “clustering” may have specific interpretations depending on the database system. It’s essential to understand these terms within the context of the system being used
+==**Warning**==: **Terminology may vary** across different database systems. Terms like “primary,” “secondary,” and “clustering” may have specific interpretations depending on the database system. It’s essential to understand these terms within the context of the system being used
 
 
 
@@ -1527,7 +1526,7 @@ Profiles are stored in the ==**data dictionary**== and contain quantitative info
 		* The system performs a **full scan** of the table or structure to find the desired value, resulting in high I/O cost.
 
 	* **Sequentially-ordered structures**:
-		* If the structure is **ordered on the attribute** A_i being queried, the cost might be lower since the scan can stop early (like in a range query).
+		* If the structure is **ordered on the attribute** $A_i$ being queried, the cost might be lower since the scan can stop early (like in a range query).
 
 * **Hash/Tree Structures:**
 
@@ -1575,6 +1574,8 @@ WHERE ID = '54'
 
 ### Equality Lookup on a ==Secondary== Hash (Unique Search Key)
 
+**secondary hash**: it refers to the **type of index** (secondary index), not secondary storage
+
 ```sql
 SELECT * 
 FROM STUDENT 
@@ -1605,6 +1606,8 @@ WHERE ID = '54'
 
 ### Equality Lookup on a ==Secondary== Hash (Non-unique Search Key)
 
+**secondary hash**: it refers to the **type of index** (secondary index), not secondary storage
+
 ```sql
 SELECT * 
 FROM STUDENT 
@@ -1633,17 +1636,16 @@ WHERE LastName = "Rossi"
 
 			* $\text{150K total tuples}$ : Each “LastName” appears on average twice.
 
-			* On average, **2 blocks** must be accessed per “LastName.”
+			* On average, **2 blocks** must be accessed per “LastName.” (the assumption is that these 2 tuples could be spread across 2 different blocks)
 
 	* **Total Cost:**
-
-		* With overflow chain cost of **0.3**:
-
-			* **1.3 I/O operations** for the hash index.
-
-			* **2 I/O operations** for ==accessing data blocks in primary storage==.
-
-			* **Total Cost** $= 1.3 + 2 = 3.3$ I/O operations.
+* With overflow chain cost of **0.3**:
+		
+	* **1.3 I/O operations** for the hash index.
+		
+	* **2 I/O operations** for ==accessing data blocks in primary storage==. 
+		
+	* **Total Cost** $= 1.3 + 2 = 3.3$ I/O operations.
 
 
 
@@ -1676,10 +1678,9 @@ The **search key** is ==**unique**==, meaning there is only one tuple per key va
 * **Note:**
 
 	* **==Primary== B+ Tree Uniqueness**:
-
-		* The leaves store the entire tuples, unlike secondary indexes that store pointers.
-
-		* This structure is **rarely used** because primary storage often directly stores the data without requiring the B+ leaves.
+* The leaves store the entire tuples, unlike secondary indexes that store pointers.
+		
+* This structure is **rarely used** because primary storage often directly stores the data without requiring the B+ leaves.
 
 
 
@@ -1907,17 +1908,16 @@ WHERE Date = '10/6/2019'
 		* Average tuples per date: $\frac{1.8M}{500} = \bf{3.6K}$ t**uples per date**.
 
 	* **Pointers Per Leaf Node**:
-
 		* Total tuples = 1.8M, spread across **2K leaf nodes**.
-
+		
 		* Each leaf node contains $\frac{1.8M}{2K} = \bf{900}$ **pointers**.
-
+		
 	* **Leaf Nodes Per Date**:
-
+	
 		* For 3.6K tuples per date, the pointers will span $\frac{3.6K}{900} = 4$ leaf nodes.
-
+	
 		* However, due to overlaps or fragmentation, these 900 pointers may span **5 blocks** on average.
-
+	
 * **Cost Analysis:**
 
 	* **Navigating the B+ Tree**:
@@ -1936,7 +1936,7 @@ WHERE Date = '10/6/2019'
 
 		* Each tuple is stored in separate blocks in the EXAM table.
 
-		* For 3.6K tuples, this requires **3.6K block accesses**.
+		* For 3.6K tuples, this requires **3.6K block accesses**. (Average tuples per date)
 
 		* **Cost of data block accesses**: 3.6K .
 
@@ -2091,7 +2091,7 @@ WHERE Date = '10/6/2019'
 
 	* Sorting organizes data based on one or more attributes (e.g., ascending or descending order).
 
-	* It’s a crucial operation in database systems for efficient query execution (e.g., ORDER BY, GROUP BY).
+	* It’s a crucial operation in database systems for efficient query execution (e.g., `ORDER BY`, `GROUP BY`).
 
 * **Types of Sorting**
 
