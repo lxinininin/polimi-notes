@@ -1,3 +1,39 @@
+# Neo4j
+
+* Write a Cypher query to collect the number of people who drive at least 5 different vehicles, one of which should either be an Ambulance or a Fire Truck
+
+	```sql
+	MATCH (p:Person) - [:DRIVES] -> (v:Vehicle)
+	WITH p, COUNT(DISTINCT v) AS 'tot_vehicles'
+	WHERE tot_vehicles >= 5
+	MATCH (p) - [:DRIVES] -> (v1:Vehicle)
+	WHERE v1:Ambulance OR v1:FireTruck
+	RETURN COUNT(DISTINCT p)
+	```
+
+	
+
+* Write a Cypher query to return the collection of Fire Trucks with a water capacity greater than 100 litres that were driven by at least 5 Firefighters named John, who also drove 10 non-Fire Truck vehicles each
+
+	```sql
+	MATCH (f:Firefighter) - [:DRIVES] -> (v:Vehicle)
+	WHERE NOT v:FireTruck
+	WITH f, COUNT(DISTINCT v) AS 'non_fire_truck_count'
+	WHERE non_fire_truck_count = 10
+	
+	MATCH (f) - [:DRIVES] -> (ft:FireTruck)
+	WHERE ft.water_capacity > 100 AND f.name = "John"
+	WITH ft, COUNT(DISTINCT f) AS 'firefighter_count'
+	WHERE firefighter_count >= 5
+	RETURN collect(ft)
+	```
+
+	
+
+
+
+
+
 # MongoDB
 
 * Count the total number:
@@ -22,11 +58,57 @@
 	}}
 	```
 
+* 
+
+  ```sql
+  {"$match": {
+      "$or": [
+          {"number_of_cards": {"$gt": 100}},
+          {"number_of_cards": {"$lt": 10}}
+      ]
+  }}
+  ```
+
 * Ensure customers have a fidelity card
 
 	```sql
 	{"$match": {"fidelityCards": {"$ne": []}}} -- fidelityCards is a Collection
 	```
+
+* Write a query to count the number of series produced by a company section named "Digital Artist & Co" with ID "908686" and for which at least one script includes the word "Pier" in its title
+
+	```sql
+	db.company_section_collection.aggregate([
+	    {"$match": {"name": "Digital Artist & Co"}},
+	   	{"$match": {"ID": "908686"}},
+	    {"$unwind": {"path": "$digital_contents"}},
+	    {"$unwind": {"path": "$digital_contents.series"}},
+	    {"$unwind": {"path": "$digital_contents.series.scripts"}},
+	    {"$match": {"digital_contents.series.scripts.title": "Pier"}},
+	    {"$group": {
+	    	"_id": "$digital_contents.series",
+	    	"series_count": {"$sum": 1}
+	    }}
+	    {"$project": {"series_count": 1}}
+	])
+	```
+	
+* Write a query to collect all the card games whose set number is greater than 10 and for which ==at least one card has its type equal to "sorcery"==. Perform the query starting from the `Card_Game_Collection`
+
+	```sql
+	db.card_game_collection.aggregate([
+	    {"$match": {"set_number": {"$gt": 10}}},
+	   	{"$match": {
+	    	"cards": {
+	    		"$elemMatch": {
+	    			"type": "sorcery"
+	    		}
+	    	}
+	    }}
+	])
+	```
+	
+	
 
 
 

@@ -1000,7 +1000,7 @@ For each developer, extract the count of the games which tags field contains the
 ```http
 GET /stream_overviews/_search
 {
-	"size": 0
+	"size": 0,
 	"query": {
 		"bool": {
 			"must": [
